@@ -1,0 +1,142 @@
+[
+    {
+        "indonesia": "air",
+        "inggris": "water",
+        "sunda": "cai",
+        "sinonim": ["tirta"],
+        "antonim": []
+    },
+    {
+        "indonesia": "api",
+        "inggris": "fire",
+        "sunda": "seuneu",
+        "sinonim": ["bara"],
+        "antonim": ["air"]
+    },
+    {
+        "indonesia": "apel",
+        "inggris": "apple",
+        "sunda": "apel",
+        "sinonim": ["buah apel"],
+        "antonim": []
+    },
+    {
+        "indonesia": "ayam",
+        "inggris": "chicken",
+        "sunda": "hayam",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "anjing",
+        "inggris": "dog",
+        "sunda": "anjing",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "burung",
+        "inggris": "bird",
+        "sunda": "manuk",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "buku",
+        "inggris": "book",
+        "sunda": "buku",
+        "sinonim": ["kitab"],
+        "antonim": []
+    },
+    {
+        "indonesia": "bola",
+        "inggris": "ball",
+        "sunda": "bal",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "komputer",
+        "inggris": "computer",
+        "sunda": "komputer",
+        "sinonim": ["PC"],
+        "antonim": []
+    },
+    {
+        "indonesia": "mobil",
+        "inggris": "car",
+        "sunda": "mobil",
+        "sinonim": ["kendaraan"],
+        "antonim": []
+    },
+    {
+        "indonesia": "motor",
+        "inggris": "motorcycle",
+        "sunda": "motor",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "rumah",
+        "inggris": "house",
+        "sunda": "imah",
+        "sinonim": ["hunian"],
+        "antonim": []
+    },
+    {
+        "indonesia": "sekolah",
+        "inggris": "school",
+        "sunda": "sakola",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "guru",
+        "inggris": "teacher",
+        "sunda": "guru",
+        "sinonim": ["pengajar"],
+        "antonim": []
+    },
+    {
+        "indonesia": "murid",
+        "inggris": "student",
+        "sunda": "murid",
+        "sinonim": ["pelajar"],
+        "antonim": []
+    },
+    {
+        "indonesia": "makan",
+        "inggris": "eat",
+        "sunda": "tuang",
+        "sinonim": ["menyantap"],
+        "antonim": ["puasa"]
+    },
+    {
+        "indonesia": "minum",
+        "inggris": "drink",
+        "sunda": "nginum",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "besar",
+        "inggris": "big",
+        "sunda": "gedé",
+        "sinonim": ["luas"],
+        "antonim": ["kecil"]
+    },
+    {
+        "indonesia": "kecil",
+        "inggris": "small",
+        "sunda": "leutik",
+        "sinonim": ["mungil"],
+        "antonim": ["besar"]
+    },
+    {
+        "indonesia": "cepat",
+        "inggris": "fast",
+        "sunda": "gancang",
+        "sinonim": ["kilat"],
+        "antonim": ["lambat"]
+    }
+]
