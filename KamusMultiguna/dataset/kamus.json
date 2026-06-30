@@ -154,7 +154,7 @@
     {
         "indonesia": "besar",
         "inggris": "big",
-        "sunda": "ged\u00e9",
+        "sunda": "gedé",
         "sinonim": [
             "luas",
             "raya",
@@ -296,7 +296,7 @@
     {
         "indonesia": "tampan",
         "inggris": "handsome",
-        "sunda": "kas\u00e9p",
+        "sunda": "kasép",
         "sinonim": [
             "gagah",
             "rupawan"
@@ -423,7 +423,7 @@
     {
         "indonesia": "hari",
         "inggris": "day",
-        "sunda": "po\u00e9",
+        "sunda": "poé",
         "sinonim": [],
         "antonim": []
     },
@@ -471,7 +471,7 @@
     {
         "indonesia": "hijau",
         "inggris": "green",
-        "sunda": "h\u00e9jo",
+        "sunda": "héjo",
         "sinonim": [],
         "antonim": []
     },
@@ -485,7 +485,7 @@
     {
         "indonesia": "kuning",
         "inggris": "yellow",
-        "sunda": "kon\u00e9ng",
+        "sunda": "konéng",
         "sinonim": [],
         "antonim": []
     },
@@ -541,7 +541,7 @@
     {
         "indonesia": "meja",
         "inggris": "table",
-        "sunda": "m\u00e9ja",
+        "sunda": "méja",
         "sinonim": [],
         "antonim": []
     },
@@ -567,130 +567,8 @@
     {
         "indonesia": "jendela",
         "inggris": "window",
-        "sunda": "jand\u00e9la",
+        "sunda": "jandéla",
         "sinonim": [],
-        "antonim": []
-    },
-    {
-        "indonesia": "kemaluan",
-        "inggris": "genitals",
-        "sunda": "palawangan",
-        "sinonim": [
-            "alat kelamin",
-            "aurat"
-        ],
-        "antonim": []
-    },
-    {
-        "indonesia": "penis",
-        "inggris": "penis",
-        "sunda": "kontol",
-        "sinonim": [
-            "zakar",
-            "kemaluan pria",
-            "alat kelamin laki-laki",
-            "burung"
-        ],
-        "antonim": [
-            "vagina"
-        ]
-    },
-    {
-        "indonesia": "vagina",
-        "inggris": "vagina",
-        "sunda": "memek",
-        "sinonim": [
-            "puki",
-            "kemaluan wanita",
-            "alat kelamin perempuan"
-        ],
-        "antonim": [
-            "penis"
-        ]
-    },
-    {
-        "indonesia": "testis",
-        "inggris": "testicle",
-        "sunda": "kanjut",
-        "sinonim": [
-            "buah zakar",
-            "pelir",
-            "biji kemaluan",
-            "pisitan"
-        ],
-        "antonim": []
-    },
-    {
-        "indonesia": "rahim",
-        "inggris": "uterus",
-        "sunda": "kandungan",
-        "sinonim": [
-            "womb",
-            "kandungan"
-        ],
-        "antonim": []
-    },
-    {
-        "indonesia": "payudara",
-        "inggris": "breast",
-        "sunda": "susu",
-        "sinonim": [
-            "buah dada",
-            "tetek",
-            "pinarep"
-        ],
-        "antonim": []
-    },
-    {
-        "indonesia": "pantat",
-        "inggris": "buttocks",
-        "sunda": "bujur",
-        "sinonim": [
-            "bokong",
-            "pantat"
-        ],
-        "antonim": []
-    },
-    {
-        "indonesia": "sperma",
-        "inggris": "sperm",
-        "sunda": "peju",
-        "sinonim": [
-            "air mani",
-            "benih",
-            "mani"
-        ],
-        "antonim": [
-            "sel telur"
-        ]
-    },
-    {
-        "indonesia": "sel telur",
-        "inggris": "ovum",
-        "sunda": "sel endog",
-        "sinonim": [
-            "indung telur"
-        ],
-        "antonim": [
-            "sperma"
-        ]
-    },
-    {
-        "indonesia": "klitoris",
-        "inggris": "clitoris",
-        "sunda": "itil",
-        "sinonim": [
-            "kelentit"
-        ],
-        "antonim": []
-    },
-    {
-        "indonesia": "selangkangan",
-        "inggris": "groin",
-        "sunda": "palangkakan",
-        "sinonim": [
-            "paha dalam"
-        ],
         "antonim": []
     },
     {

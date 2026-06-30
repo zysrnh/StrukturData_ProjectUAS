@@ -1,420 +1,564 @@
 # Mengimpor modul tkinter untuk membuat GUI (Antarmuka Pengguna)
 import tkinter as tk
-# Mengimpor kotak pesan dan dialog dari tkinter
-from tkinter import messagebox, simpledialog
-import json  # Mengimpor modul json untuk membaca file data JSON
-import os  # Mengimpor modul os untuk berinteraksi dengan sistem file
-import random  # Mengimpor modul random untuk mode kuis
-import difflib  # Untuk fallback fuzzy matching
+from tkinter import messagebox, ttk
+import json
+import os
+import random
 
-# ==========================================
-# 1. STRUKTUR DATA: TRIE (Untuk Autocomplete)
-# ==========================================
+from modules.Trie import Trie
+from modules.DoublyLinkedList import DoublyLinkedList
+from modules.FuzzySearch import get_fuzzy_suggestions
+from modules.HashTable import HashTable
 
-
-class TrieNode:  # Membuat kelas untuk setiap simpul (node) pada Trie
-    def __init__(self):  # Konstruktor untuk menginisialisasi node baru
-        # Dictionary (Hash Table) untuk menyimpan huruf-huruf anak
-        self.children = {}
-        # Boolean penanda apakah node ini adalah akhir dari sebuah kata
-        self.is_end_of_word = False
+# ============================================================
+# MODUL 4: KELAS APLIKASI GUI UTAMA (KamusApp)
+# Mengelola seluruh tampilan dan logika interaksi pengguna
+# ============================================================
 
 
-class Trie:  # Membuat kelas Trie untuk menampung seluruh node
-    def __init__(self):  # Konstruktor Trie
-        self.root = TrieNode()  # Menginisialisasi akar (root) Trie sebagai TrieNode kosong
+class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
+    def __init__(self, root):  # Konstruktor: dipanggil saat aplikasi pertama dijalankan
+        self.root = root                     # Simpan referensi jendela utama Tkinter
+        self.root.title("Kamus Multi Guna")  # Judul yang tampil di title bar jendela
 
-    def insert(self, word):  # Fungsi untuk memasukkan kata ke dalam Trie
-        node = self.root  # Memulai dari akar (root)
-        for char in word:  # Melakukan iterasi untuk setiap huruf dalam kata
-            if char not in node.children:  # Jika huruf belum ada di anak-anak node
-                # Buat node baru untuk huruf tersebut
-                node.children[char] = TrieNode()
-            node = node.children[char]  # Pindah ke node anak tersebut
-        node.is_end_of_word = True  # Setelah semua huruf dimasukkan, tandai sebagai akhir kata
+        self.hash_table   = HashTable()               # Hash Table: penyimpanan utama data kamus O(1)
+        self.trie         = Trie()           # Trie: struktur untuk autocomplete
+        self.history      = DoublyLinkedList() # DLL: navigasi riwayat pencarian
+        self.favorites    = set()            # Set: daftar kata favorit (tidak duplikat)
+        self.quiz_history = []               # List: menyimpan hasil sesi kuis
 
-    # Fungsi untuk mencari node akhir dari sebuah awalan (prefix)
-    def search_prefix(self, prefix):
-        node = self.root  # Memulai dari akar
-        for char in prefix:  # Iterasi setiap huruf dalam awalan
-            if char not in node.children:  # Jika huruf tidak ditemukan
-                return None  # Kembalikan None karena awalan tidak ada
-            node = node.children[char]  # Pindah ke anak node
-        return node  # Kembalikan node terakhir dari awalan tersebut
+        self.load_data()        # Muat data kamus dari file JSON ke struktur data
+        self.create_widgets()   # Bangun tampilan antarmuka grafis
 
-    # Fungsi untuk mengambil semua kata dengan awalan tertentu
-    def get_words_with_prefix(self, prefix):
-        node = self.search_prefix(prefix)  # Mencari node awalan
-        words = []  # List kosong untuk menyimpan daftar kata yang ditemukan
-        if node:  # Jika node awalan ditemukan
-            # Panggil fungsi pencarian DFS (Depth First Search)
-            self._dfs(node, prefix, words)
-        return words  # Kembalikan daftar kata
+    # ─────────────────────────────────────────────
+    # MODUL 4B: PEMUATAN DATA KAMUS DARI JSON
+    # Membaca file kamus.json dan mengisi Hash Table & Trie
+    # ─────────────────────────────────────────────
+    def load_data(self):  # Fungsi memuat dan memparsing data kamus dari file JSON
+        script_dir  = os.path.dirname(os.path.abspath(__file__)) # Dapatkan folder lokasi script
+        path_kamus  = os.path.join(script_dir, "dataset", "kamus.json") # Rangkai path file kamus
+        self.kamus_data = []   # Inisialisasi list data mentah untuk keperluan mode kuis
 
-    def _dfs(self, node, current_word, words):  # Fungsi rekursif DFS untuk menelusuri Trie
-        if node.is_end_of_word:  # Jika node ini adalah akhir kata
-            words.append(current_word)  # Tambahkan kata ke dalam list words
-        for char, child_node in node.children.items():  # Iterasi semua anak dari node saat ini
-            # Panggil DFS lagi dengan menambahkan huruf
-            self._dfs(child_node, current_word + char, words)
+        if os.path.exists(path_kamus):  # Cek apakah file kamus.json ada
+            with open(path_kamus, 'r', encoding='utf-8') as f: # Buka file dengan encoding UTF-8
+                data = json.load(f)          # Parse JSON menjadi list Python
+                self.kamus_data = data       # Simpan data mentah untuk kuis
+                for item in data:            # Iterasi setiap entri kata
+                    indonesia = item.get("indonesia", "") # Ambil kata dalam bahasa Indonesia
+                    inggris   = item.get("inggris",   "") # Ambil kata dalam bahasa Inggris
+                    sunda     = item.get("sunda",     "") # Ambil kata dalam bahasa Sunda
+                    sinonim   = ", ".join(item.get("sinonim", [])) # Gabung daftar sinonim
+                    antonim   = ", ".join(item.get("antonim", [])) # Gabung daftar antonim
 
-# ==========================================
-# 2. STRUKTUR DATA: DOUBLY LINKED LIST (Riwayat)
-# ==========================================
-
-
-class NodeDLL:  # Kelas untuk simpul (node) pada Doubly Linked List
-    def __init__(self, data):  # Konstruktor node DLL
-        self.data = data  # Menyimpan data (berupa kata yang dicari)
-        self.prev = None  # Pointer untuk menunjuk ke node sebelumnya
-        self.next = None  # Pointer untuk menunjuk ke node selanjutnya
-
-
-class DoublyLinkedList:  # Kelas untuk Doubly Linked List itu sendiri
-    def __init__(self):  # Konstruktor DLL
-        self.head = None  # Pointer ke simpul pertama
-        self.tail = None  # Pointer ke simpul terakhir
-        # Pointer untuk menandai posisi saat ini (untuk Back/Forward)
-        self.current = None
-
-    def add(self, data):  # Fungsi menambahkan riwayat baru
-        new_node = NodeDLL(data)  # Membuat node baru
-        if self.head is None:  # Jika list masih kosong
-            self.head = new_node  # Node baru menjadi kepala (head)
-            self.tail = new_node  # Node baru menjadi ekor (tail)
-            self.current = new_node  # Posisi saat ini berada di node baru
-        else:  # Jika list tidak kosong
-            new_node.prev = self.current  # Node baru menunjuk ke node saat ini sebagai prev
-            self.current.next = new_node  # Node saat ini menunjuk ke node baru sebagai next
-            self.tail = new_node  # Ekor diperbarui menjadi node baru
-            self.current = new_node  # Posisi saat ini pindah ke node baru
-
-    def go_back(self):  # Fungsi untuk mundur satu langkah di riwayat (Back)
-        if self.current and self.current.prev:  # Jika ada posisi saat ini dan ada posisi sebelumnya
-            self.current = self.current.prev  # Pindah ke posisi sebelumnya
-            return self.current.data  # Kembalikan kata di posisi tersebut
-        return None  # Jika tidak bisa mundur, kembalikan None
-
-    def go_forward(self):  # Fungsi untuk maju satu langkah di riwayat (Forward)
-        if self.current and self.current.next:  # Jika ada posisi saat ini dan ada posisi selanjutnya
-            self.current = self.current.next  # Pindah ke posisi selanjutnya
-            return self.current.data  # Kembalikan kata di posisi tersebut
-        return None  # Jika tidak bisa maju, kembalikan None
-
-# ==========================================
-# 3. ALGORITMA LEVENSHTEIN (Fuzzy Search)
-# ==========================================
-
-
-# Fungsi untuk menghitung jarak perubahan antara dua kata
-def levenshtein_distance(s1, s2):
-    if len(s1) < len(s2):  # Jika s1 lebih pendek
-        # Tukar posisi s1 dan s2 agar s1 selalu lebih panjang
-        return levenshtein_distance(s2, s1)
-    if len(s2) == 0:  # Jika s2 kosong
-        # Jaraknya adalah panjang s1 (harus menambah sebanyak panjang s1)
-        return len(s1)
-
-    previous_row = range(len(s2) + 1)  # Inisialisasi baris pertama perhitungan
-    for i, c1 in enumerate(s1):  # Iterasi setiap karakter di kata pertama
-        current_row = [i + 1]  # Baris saat ini diawali dengan indeks i+1
-        for j, c2 in enumerate(s2):  # Iterasi setiap karakter di kata kedua
-            # Hitung biaya jika menambah (insertion)
-            insertions = previous_row[j + 1] + 1
-            # Hitung biaya jika menghapus (deletion)
-            deletions = current_row[j] + 1
-            # Hitung biaya jika mengganti (substitution)
-            substitutions = previous_row[j] + (c1 != c2)
-            # Pilih biaya terkecil
-            current_row.append(min(insertions, deletions, substitutions))
-        previous_row = current_row  # Pindah ke baris berikutnya
-    # Kembalikan nilai di pojok kanan bawah (jarak total)
-    return previous_row[-1]
-
-
-def get_fuzzy_suggestions(word, candidates, max_suggestions=5): # Fungsi mencari kata-kata yang mirip dengan input (untuk koreksi typo)
-    # Tentukan toleransi typo berdasarkan panjang kata yang diketik user
-    if len(word) <= 2: # Kata sangat pendek (1-2 huruf)
-        max_distance = 1 # Toleransi hanya 1 perubahan
-    elif len(word) <= 4: # Kata pendek (3-4 huruf) contoh: "ayr" -> "air"
-        max_distance = 2 # Toleransi 2 perubahan agar lebih fleksibel
-    elif len(word) <= 7: # Kata sedang (5-7 huruf) contoh: "ceapt" -> "cepat"
-        max_distance = 2 # Toleransi 2 perubahan
-    else: # Kata panjang (8+ huruf) contoh: "komputre" -> "komputer"
-        max_distance = 3 # Toleransi 3 perubahan
-
-    matches = [] # List untuk menampung pasangan (kata_kandidat, jarak_levenshtein)
-    for candidate in candidates: # Iterasi seluruh kata di Hash Table
-        # Skip kata yang panjangnya terlalu jauh berbeda (hemat performa)
-        if abs(len(candidate) - len(word)) > max_distance:
-            continue # Lewati kandidat ini
-        dist = levenshtein_distance(word, candidate) # Hitung jarak Levenshtein
-        if dist <= max_distance and dist > 0: # Jika jaraknya dalam toleransi dan bukan kata yang persis sama
-            # Beri bonus skor jika 2 huruf awal sama (kemungkinan besar benar)
-            prefix_bonus = 0 # Inisialisasi bonus awal
-            if len(word) >= 2 and len(candidate) >= 2: # Pastikan kedua kata cukup panjang
-                if word[:2] == candidate[:2]: # Jika 2 huruf pertama sama
-                    prefix_bonus = -0.5 # Kurangi skor (semakin kecil = semakin mirip)
-            matches.append((candidate, dist + prefix_bonus)) # Tambahkan ke daftar dengan skor akhir
-
-    matches.sort(key=lambda item: (item[1], item[0])) # Urutkan berdasarkan skor (kecil = lebih mirip), lalu abjad
-    if matches: # Jika ditemukan kandidat
-        # Ubah skor kembali ke integer untuk tampilan yang bersih
-        return [(w, int(d)) for w, d in matches[:max_suggestions]]
-
-    # Fallback: Gunakan difflib jika Levenshtein tidak menemukan hasil
-    close_matches = difflib.get_close_matches( # Cari kecocokan menggunakan algoritma SequenceMatcher
-        word, list(candidates), n=max_suggestions, cutoff=0.45) # cutoff rendah agar lebih permisif
-    fallback = [(candidate, levenshtein_distance(word, candidate)) # Hitung ulang jarak untuk tampilan
-                for candidate in close_matches]
-    fallback.sort(key=lambda item: (item[1], item[0])) # Urutkan hasil
-    return fallback[:max_suggestions] # Kembalikan maksimal 5 saran
-
-# ==========================================
-# 4. KELAS APLIKASI GUI UTAMA
-# ==========================================
-
-
-class KamusApp:  # Kelas utama untuk aplikasi
-    def __init__(self, root):  # Konstruktor dengan parameter root (jendela Tkinter)
-        self.root = root  # Menyimpan referensi jendela utama
-        # Memberi judul pada jendela aplikasi
-        self.root.title("Kamus Multi Guna")
-        # Mengatur ukuran jendela menjadi 600x550 pixel
-        self.root.geometry("600x550")
-
-        self.hash_table = {}  # Inisialisasi Hash Table menggunakan dictionary bawaan Python
-        self.trie = Trie()  # Menginisialisasi objek Trie untuk autocomplete
-        # Menginisialisasi objek Doubly Linked List untuk riwayat
-        self.history = DoublyLinkedList()
-        # Menginisialisasi Set untuk menyimpan kata favorit (agar tidak ganda)
-        self.favorites = set()
-
-        self.load_data()  # Memanggil fungsi untuk memuat data JSON ke struktur data
-        self.create_widgets()  # Memanggil fungsi untuk membuat elemen-elemen GUI
-
-    def load_data(self):  # Fungsi membaca dan memasukkan data kamus
-        # Mendapatkan folder tempat script ini berada
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        # Menentukan path file kamus baru secara absolut
-        path_kamus = os.path.join(script_dir, "jeson", "kamus.json")
-        if os.path.exists(path_kamus):  # Mengecek apakah file tersebut ada
-            with open(path_kamus, 'r', encoding='utf-8') as f:  # Membuka file untuk dibaca
-                data = json.load(f)  # Membaca file JSON
-                for item in data:  # Iterasi setiap entri di dalam list JSON
-                    # Mengambil kata bahasa Indonesia
-                    indonesia = item.get("indonesia", "")
-                    # Mengambil kata bahasa Inggris
-                    inggris = item.get("inggris", "")
-                    # Mengambil kata bahasa Sunda
-                    sunda = item.get("sunda", "")
-                    # Menggabungkan array sinonim menjadi string
-                    sinonim = ", ".join(item.get("sinonim", []))
-                    # Menggabungkan array antonim menjadi string
-                    antonim = ", ".join(item.get("antonim", []))
-
-                    # Format teks terjemahan yang akan ditampilkan
                     arti_teks = f"\n- Indonesia: {indonesia}\n- Inggris: {inggris}\n- Sunda: {sunda}"
-                    if sinonim:
-                        arti_teks += f"\n- Sinonim: {sinonim}"
-                    if antonim:
-                        arti_teks += f"\n- Antonim: {antonim}"
+                    if sinonim: arti_teks += f"\n- Sinonim: {sinonim}"
+                    if antonim: arti_teks += f"\n- Antonim: {antonim}"
 
-                    # Fungsi internal untuk menambahkan kata ke struktur data
                     def tambah_kata(kata):
-                        if kata:  # Jika kata tidak kosong
-                            kata_lower = kata.lower()  # Ubah ke huruf kecil
-                            # Simpan teks arti ke Hash Table (Dictionary)
-                            self.hash_table[kata_lower] = arti_teks
-                            # Masukkan kata ke Trie untuk Autocomplete
-                            self.trie.insert(kata_lower)
+                        if kata:
+                            k = kata.lower()
+                            self.hash_table.set(k, arti_teks)
+                            self.trie.insert(k)
 
-                    # Menambahkan semua bahasa agar bisa dicari dari bahasa mana pun
                     tambah_kata(indonesia)
                     tambah_kata(inggris)
                     tambah_kata(sunda)
 
-    def create_widgets(self):  # Fungsi untuk mengatur tampilan GUI
-        # Membuat sebuah frame penampung untuk area pencarian
-        search_frame = tk.Frame(self.root)
-        # Menempatkan frame dengan padding (jarak) atas-bawah 10
-        search_frame.pack(pady=10)
+    # ─────────────────────────────────────────────
+    # MODUL 4A: PEMBUATAN WIDGET GUI UTAMA
+    # Membangun semua elemen tampilan jendela utama
+    # ─────────────────────────────────────────────
+    def create_widgets(self):
+        # == Palet warna tema "Kalem" (muted steel-blue) ==
+        C_BG     = "#f0f2f5"   # Abu-abu terang untuk latar belakang utama
+        C_PANEL  = "#ffffff"   # Putih bersih untuk panel/kartu
+        C_ACCENT = "#2563eb"   # Biru korporat sebagai warna aksen utama
+        C_HEADER = "#1e3a5f"   # Biru tua gelap untuk header
+        C_TEXT   = "#1e293b"   # Teks utama hampir hitam
+        C_MUTED  = "#64748b"   # Teks sekunder abu-abu medium
+        C_BORDER = "#cbd5e1"   # Garis batas abu-abu muda
+        C_BTN    = "#334155"   # Tombol standar abu gelap
+        C_INPUT  = "#ffffff"   # Latar kotak input putih
+        C_RESULT = "#f8fafc"   # Latar area hasil sangat terang
 
-        tk.Label(search_frame, text="Masukkan Kata:").pack(
-            side=tk.LEFT)  # Menambahkan label teks
+        # == Ukuran & konfigurasi jendela utama ==
+        self.root.configure(bg=C_BG)          # Terapkan warna latar belakang utama
+        self.root.geometry("760x620")          # Ukuran jendela: lebar x tinggi (pixel)
+        self.root.resizable(False, False)      # Larang pengubahan ukuran jendela
 
-        self.entry_var = tk.StringVar()  # Variabel penampung teks untuk entry pencarian
-        # Memicu fungsi on_typing setiap kali ada teks diketik
-        self.entry_var.trace_add("write", self.on_typing)
+        # == BAGIAN HEADER: Judul aplikasi ==
+        header = tk.Frame(self.root, bg=C_HEADER, pady=14) # Frame header biru tua
+        header.pack(fill=tk.X)                # Bentangkan penuh secara horizontal
+        tk.Label(                             # Label judul utama
+            header, text="Kamus Multi Guna",
+            font=("Segoe UI", 15, "bold"), bg=C_HEADER, fg="white"
+        ).pack()
+        tk.Label(                             # Label sub-judul bahasa
+            header, text="Indonesia  ·  Inggris  ·  Sunda",
+            font=("Segoe UI", 9), bg=C_HEADER, fg="#93c5fd"
+        ).pack()
 
-        # Membuat input teks (Entry)
-        self.entry = tk.Entry(
-            search_frame, textvariable=self.entry_var, width=35)
-        # Menempatkan input di sebelah kiri dengan padding samping 5
-        self.entry.pack(side=tk.LEFT, padx=5)
-        self.entry.bind("<Return>", lambda event: self.search_word())
+        # == BAGIAN PENCARIAN: Kotak input + tombol cari ==
+        sf = tk.Frame(self.root, bg=C_PANEL, padx=18, pady=12, # Frame area pencarian
+                      relief=tk.FLAT, bd=0)
+        sf.pack(fill=tk.X, padx=14, pady=(12, 0))              # Tempatkan dengan margin
 
-        tk.Button(search_frame, text="Cari", command=self.search_word).pack(
-            side=tk.LEFT)  # Membuat tombol Cari
+        tk.Label(sf, text="Cari Kata:", font=("Segoe UI", 10, "bold"), # Label "Cari Kata:"
+                 bg=C_PANEL, fg=C_TEXT).grid(row=0, column=0, sticky="w", padx=(0,10))
 
-        # Membuat kotak daftar (Listbox) untuk Autocomplete
-        self.autocomplete_list = tk.Listbox(self.root, height=5, width=50)
-        self.autocomplete_list.pack()  # Menempatkan Listbox ke dalam jendela
-        # Jika item diklik, jalankan fungsi
-        self.autocomplete_list.bind(
-            "<<ListboxSelect>>", self.on_autocomplete_select)
+        self.entry_var = tk.StringVar()                         # Variabel penampung teks input
+        self.entry_var.trace_add("write", self.on_typing)       # Pantau perubahan ketikan
 
-        nav_frame = tk.Frame(self.root)  # Membuat frame untuk tombol navigasi
-        nav_frame.pack(pady=10)  # Menempatkan frame dengan padding
+        self.entry = tk.Entry(                                  # Kotak input pencarian
+            sf, textvariable=self.entry_var, width=48,
+            font=("Segoe UI", 10), bg=C_INPUT, fg=C_TEXT,
+            relief=tk.SOLID, bd=1
+        )
+        self.entry.grid(row=0, column=1, padx=(0, 8), sticky="we") # Tempatkan di kolom 1
+        self.entry.bind("<Return>", lambda e: self.search_word())   # Enter = jalankan pencarian
 
-        tk.Button(nav_frame, text="< Back", command=self.go_back).pack(
-            side=tk.LEFT, padx=5)  # Membuat tombol Back
-        tk.Button(nav_frame, text="Forward >", command=self.go_forward).pack(
-            side=tk.LEFT, padx=5)  # Membuat tombol Forward
-        tk.Button(nav_frame, text="Tambah Favorit", command=self.add_favorite).pack(
-            side=tk.LEFT, padx=5)  # Tombol Tambah Favorit
+        tk.Button(                                              # Tombol Cari berwarna biru
+            sf, text="Cari", command=self.search_word,
+            font=("Segoe UI", 10, "bold"), bg=C_ACCENT,
+            fg="white", relief=tk.FLAT, padx=14, cursor="hand2"
+        ).grid(row=0, column=2)
 
-        menu_frame = tk.Frame(self.root)  # Membuat frame untuk menu tambahan
-        menu_frame.pack(pady=5)  # Menempatkan frame dengan padding
+        # == BAGIAN AUTOCOMPLETE: Saran kata saat mengetik ==
+        tk.Label(sf, text="Saran:", font=("Segoe UI", 8),      # Label kecil "Saran:"
+                 bg=C_PANEL, fg=C_MUTED).grid(row=1, column=0, sticky="nw", pady=(6,0))
 
-        tk.Button(menu_frame, text="Daftar Favorit", command=self.show_favorites).pack(
-            side=tk.LEFT, padx=5)  # Tombol Lihat Favorit
-        tk.Button(menu_frame, text="Mode Kuis", command=self.quiz_mode).pack(
-            side=tk.LEFT, padx=5)  # Tombol untuk Kuis
+        self.autocomplete_list = tk.Listbox(                    # Listbox saran autocomplete
+            sf, height=4, font=("Segoe UI", 10),
+            bg=C_INPUT, fg=C_TEXT, selectbackground=C_ACCENT,
+            selectforeground="white", relief=tk.SOLID, bd=1, activestyle="none"
+        )
+        self.autocomplete_list.grid(row=1, column=1, sticky="we", pady=(6,0)) # Tempatkan di bawah input
+        self.autocomplete_list.bind("<<ListboxSelect>>", self.on_autocomplete_select) # Klik = pilih saran
 
-        # Membuat area Teks hasil (Text)
-        self.result_text = tk.Text(
-            self.root, height=12, width=65, state=tk.DISABLED)
-        self.result_text.pack(pady=10)  # Menempatkan area Teks dengan padding
+        sf.grid_columnconfigure(1, weight=1)  # Kolom input bisa melebar
 
-    def on_typing(self, *args):  # Fungsi ini dijalankan saat user mengetik huruf
-        # Mengambil huruf/kata yang sedang diketik
+        # == BAGIAN TOOLBAR: Tombol navigasi dan menu ==
+        toolbar = tk.Frame(self.root, bg=C_BG, pady=8)         # Frame toolbar tengah
+        toolbar.pack(fill=tk.X, padx=14)
+
+        def mkbtn(parent, text, cmd, bg=C_BTN):                # Helper pembuat tombol seragam
+            return tk.Button(parent, text=text, command=cmd,
+                             font=("Segoe UI", 9, "bold"), bg=bg,
+                             fg="white", relief=tk.FLAT, padx=9, pady=4, cursor="hand2")
+
+        # -- Navigasi kiri: Back & Forward --
+        left = tk.Frame(toolbar, bg=C_BG)                      # Frame sisi kiri toolbar
+        left.pack(side=tk.LEFT)
+        mkbtn(left, "< Back",    self.go_back).pack(side=tk.LEFT, padx=(0,4))   # Tombol kembali riwayat
+        mkbtn(left, "Forward >", self.go_forward).pack(side=tk.LEFT, padx=4)    # Tombol maju riwayat
+
+        # -- Menu kanan: Favorit, Riwayat, Kuis --
+        right = tk.Frame(toolbar, bg=C_BG)                     # Frame sisi kanan toolbar
+        right.pack(side=tk.RIGHT)
+        mkbtn(right, "Favorit",  self.add_favorite,  "#0f766e").pack(side=tk.LEFT, padx=4) # Tombol tambah favorit (hijau teal)
+        mkbtn(right, "Daftar",   self.show_favorites, "#0369a1").pack(side=tk.LEFT, padx=4) # Tombol lihat daftar favorit (biru)
+        mkbtn(right, "Riwayat",  self.show_history,   "#4338ca").pack(side=tk.LEFT, padx=4) # Tombol riwayat pencarian (indigo)
+        mkbtn(right, "Kuis",     self.quiz_mode,      "#b45309").pack(side=tk.LEFT, padx=(4,0)) # Tombol mode kuis (cokelat)
+
+        # == BAGIAN HASIL: Kotak tampilan hasil pencarian ==
+        rf = tk.Frame(self.root, bg=C_PANEL, padx=14, pady=10) # Frame area hasil
+        rf.pack(fill=tk.BOTH, expand=True, padx=14, pady=(6, 14))
+
+        tk.Label(rf, text="Hasil Pencarian:", font=("Segoe UI", 10, "bold"), # Label judul area hasil
+                 bg=C_PANEL, fg=C_TEXT).pack(anchor="w", pady=(0, 6))
+
+        self.result_text = tk.Text(                             # Kotak teks hasil (read-only)
+            rf, font=("Consolas", 10), bg=C_RESULT, fg=C_TEXT,
+            state=tk.DISABLED, wrap=tk.WORD, padx=10, pady=10,
+            relief=tk.SOLID, bd=1
+        )
+        self.result_text.pack(fill=tk.BOTH, expand=True)       # Isi seluruh area yang tersedia
+
+    def on_typing(self, *args):
         prefix = self.entry_var.get().lower()
-        # Mengosongkan daftar saran (autocomplete) sebelumnya
         self.autocomplete_list.delete(0, tk.END)
-        if prefix:  # Jika kotak pencarian tidak kosong
-            # Cari di Trie semua kata yang memiliki awalan ini
+        if prefix:
             words = self.trie.get_words_with_prefix(prefix)
-            for w in words[:6]:  # Ambil maksimal 6 kata pertama saja
-                # Masukkan kata tersebut ke Listbox untuk ditampilkan
+            for w in words[:6]:
                 self.autocomplete_list.insert(tk.END, w)
 
-    # Fungsi ini jalan jika user mengklik salah satu saran Autocomplete
     def on_autocomplete_select(self, event):
-        # Cek baris ke berapa yang dipilih oleh user
         selection = event.widget.curselection()
-        if selection:  # Jika ada baris yang dipilih
-            # Ambil teks dari baris tersebut
+        if selection:
             word = event.widget.get(selection[0])
-            # Isi teks tersebut ke kotak input pencarian (Entry)
             self.entry_var.set(word)
-            self.search_word()  # Langsung lakukan proses pencarian
+            self.search_word()
 
-    # Fungsi pembantu untuk menampilkan pesan di kotak Hasil (Text)
     def display_result(self, text):
-        # Buka kunci edit Text agar bisa disisipi teks
         self.result_text.config(state=tk.NORMAL)
-        # Hapus isi yang sudah ada sebelumnya
         self.result_text.delete(1.0, tk.END)
-        self.result_text.insert(tk.END, text)  # Tulis/sisipkan teks yang baru
-        # Kunci kembali edit Text agar teks tidak bisa diubah user
+        self.result_text.insert(tk.END, text)
         self.result_text.config(state=tk.DISABLED)
 
-    def search_word(self, word_to_search=None):  # Fungsi utama mencari arti kata
-        # Mengambil kata, membersihkan spasi depan/belakang
+    def search_word(self, word_to_search=None):
         word = word_to_search or self.entry_var.get().lower().strip()
-        if not word:  # Jika kosong, batalkan
-            return  # Keluar fungsi
+        if not word:
+            return
 
-        # 1. Cari kata langsung di Hash Table (Pencarian O(1))
-        if word in self.hash_table:
-            arti = self.hash_table[word]  # Jika ada, ambil artinya
-            # Tampilkan kata dan artinya
+        if self.hash_table.contains(word):
+            arti = self.hash_table.get(word)
             self.display_result(f"Kata: {word}\nArti: {arti}")
-            # Jika dipanggil dari tombol cari (bukan dari Back/Forward)
             if not word_to_search:
-                # Masukkan kata tersebut ke Doubly Linked List sebagai Riwayat
                 self.history.add(word)
         else:
-            # Info bahwa akan mencari saran
-            self.display_result(
-                f"Kata '{word}' tidak ditemukan.\nMencari saran...")
-            self.root.update()  # Memaksa update tampilan GUI
+            self.display_result(f"Kata '{word}' tidak ditemukan.\nMencari saran...")
+            self.root.update()
 
-            # 2. Fitur Typo / Fuzzy Search dengan Algoritma Levenshtein
-            suggestions = get_fuzzy_suggestions(
-                word, self.hash_table.keys(), max_suggestions=4)
+            suggestions = get_fuzzy_suggestions(word, self.hash_table.keys(), max_suggestions=4)
             if suggestions:
                 suggestion_lines = "\n".join(
                     f"- {candidate} (jarak {dist})" for candidate, dist in suggestions)
                 best_word, best_dist = suggestions[0]
-                arti = self.hash_table[best_word]
+                arti = self.hash_table.get(best_word)
                 self.display_result(
                     f"Kata '{word}' tidak ditemukan.\n\nMungkin maksud Anda:\n{suggestion_lines}\n\nArti '{best_word}': {arti}"
                 )
             else:
-                # Info jika gagal menebak typo
                 self.display_result(
                     f"Kata '{word}' tidak ditemukan dan tidak ada saran kata yang cocok.")
 
-    def go_back(self):  # Fungsi saat tombol < Back diklik
-        # Mundur di Doubly Linked List dan ambil datanya
+    def go_back(self):
         prev_word = self.history.go_back()
-        if prev_word:  # Jika berhasil (ada riwayat sebelumnya)
-            # Ubah isi kotak pencarian jadi kata riwayat tersebut
+        if prev_word:
             self.entry_var.set(prev_word)
-            # Langsung jalankan pencarian untuk menampilkannya
             self.search_word(prev_word)
 
-    def go_forward(self):  # Fungsi saat tombol Forward > diklik
-        # Maju di Doubly Linked List dan ambil datanya
+    def go_forward(self):
         next_word = self.history.go_forward()
-        if next_word:  # Jika berhasil
-            self.entry_var.set(next_word)  # Ubah isi kotak pencarian
-            self.search_word(next_word)  # Langsung jalankan pencarian
+        if next_word:
+            self.entry_var.set(next_word)
+            self.search_word(next_word)
 
-    def add_favorite(self):  # Fungsi menyimpan daftar Favorit
-        word = self.entry_var.get().lower().strip()  # Mengambil kata dari kotak input
-        if word in self.hash_table:  # Memastikan bahwa kata tersebut valid dan ada artinya
-            # Masukkan kata tersebut ke objek set `favorites`
-            self.favorites.add(word)
-            # Memunculkan pop-up pemberitahuan
-            messagebox.showinfo(
-                "Berhasil", f"'{word}' berhasil ditambahkan ke Favorit.")
+    def add_favorite(self):
+        word = self.entry_var.get().lower().strip()
+        if self.hash_table.contains(word):
+            if word in self.favorites:
+                messagebox.showinfo("Info", f"'{word}' sudah ada di Daftar Favorit.")
+            else:
+                self.favorites.add(word)
+                messagebox.showinfo("Berhasil", f"'{word}' ditambahkan ke Daftar Favorit!")
         else:
-            # Pop-up jika kata tidak valid
-            messagebox.showwarning(
-                "Gagal", "Silakan cari kata yang valid terlebih dahulu.")
+            messagebox.showwarning("Gagal", "Cari kata yang valid terlebih dahulu.")
 
-    def show_favorites(self):  # Fungsi untuk melihat daftar kata Favorit
-        if not self.favorites:  # Mengecek jika himpunan favorites masih kosong
-            # Pop-up jika kosong
-            messagebox.showinfo(
-                "Daftar Favorit", "Belum ada kata favorit yang disimpan.")
-            return  # Keluar dari fungsi
-        # Menggabungkan semua kata favorit dengan baris baru (Enter)
-        fav_list = "\n".join(self.favorites)
-        # Memunculkan pop-up berisi daftar favorit
-        messagebox.showinfo("Daftar Favorit", fav_list)
+    def show_favorites(self):
+        win = tk.Toplevel(self.root)
+        win.title("Daftar Favorit")
+        win.geometry("500x380")
+        win.resizable(False, False)
 
-    def quiz_mode(self):  # Fungsi sederhana untuk Mode Kuis
-        if not self.hash_table:  # Jika hash table belum ada data (batal)
-            return  # Keluar dari fungsi
-        # Mengacak satu kata dari kumpulan kata di Hash Table
-        word = random.choice(list(self.hash_table.keys()))
-        # Mengambil arti sebenarnya dari kata acak tersebut
-        arti = self.hash_table[word]
-        # Meminta jawaban user menggunakan Pop Up input
-        answer = simpledialog.askstring(
-            "Kuis", f"Apa terjemahan dari kata: '{word}'?")
-        if answer:  # Jika user mengisi jawaban dan menekan OK
-            # Menampilkan perbandingan jawaban user dengan hasil asli
-            messagebox.showinfo(
-                "Hasil Kuis", f"Jawaban Anda: {answer}\n\nArti Sebenarnya: {arti}")
+        tk.Label(win, text="Daftar Kata Favorit", font=("Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
+
+        columns = ("no", "kata", "arti")
+        tree = ttk.Treeview(win, columns=columns, show="headings", height=10)
+        tree.heading("no",   text="No")
+        tree.heading("kata", text="Kata")
+        tree.heading("arti", text="Terjemahan Singkat")
+        tree.column("no",   width=40,  anchor="center")
+        tree.column("kata", width=160, anchor="w")
+        tree.column("arti", width=270, anchor="w")
+        tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        if not self.favorites:
+            tree.insert("", tk.END, values=("-", "(Belum ada favorit)", "-"))
+        else:
+            for i, kata in enumerate(sorted(self.favorites), 1):
+                arti_raw = self.hash_table.get(kata, "")
+                baris = arti_raw.strip().split("\n")
+                singkat = baris[1].strip() if len(baris) > 1 else arti_raw[:40]
+                tree.insert("", tk.END, values=(i, kata, singkat))
+
+        def hapus():
+            sel = tree.selection()
+            if not sel:
+                messagebox.showwarning("Peringatan", "Pilih kata yang ingin dihapus.", parent=win)
+                return
+            kata = str(tree.item(sel[0])["values"][1])
+            self.favorites.discard(kata)
+            tree.delete(sel[0])
+
+        btn_f = tk.Frame(win)
+        btn_f.pack(pady=(0, 10))
+        tk.Button(btn_f, text="Hapus Terpilih", command=hapus, font=("Segoe UI", 9, "bold"),
+                  padx=10, pady=4, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_f, text="Tutup", command=win.destroy, font=("Segoe UI", 9, "bold"),
+                  padx=10, pady=4, cursor="hand2").pack(side=tk.LEFT, padx=5)
+
+    def show_history(self):
+        win = tk.Toplevel(self.root)
+        win.title("Riwayat Pencarian")
+        win.geometry("500x380")
+        win.resizable(False, False)
+
+        tk.Label(win, text="Riwayat Pencarian", font=("Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
+
+        columns = ("no", "kata", "arti")
+        tree = ttk.Treeview(win, columns=columns, show="headings", height=10)
+        tree.heading("no",   text="No")
+        tree.heading("kata", text="Kata Dicari")
+        tree.heading("arti", text="Terjemahan Singkat")
+        tree.column("no",   width=40,  anchor="center")
+        tree.column("kata", width=160, anchor="w")
+        tree.column("arti", width=270, anchor="w")
+        tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        riwayat = []
+        node = self.history.head
+        while node:
+            riwayat.append(node.data)
+            node = node.next
+
+        if not riwayat:
+            tree.insert("", tk.END, values=("-", "(Belum ada riwayat)", "-"))
+        else:
+            for i, kata in enumerate(riwayat, 1):
+                arti_raw = self.hash_table.get(kata, "-")
+                baris = arti_raw.strip().split("\n")
+                singkat = baris[1].strip() if len(baris) > 1 else arti_raw[:40]
+                tree.insert("", tk.END, values=(i, kata, singkat))
+
+            if self.history.current and self.history.current.data in riwayat:
+                idx = riwayat.index(self.history.current.data)
+                children = tree.get_children()
+                if idx < len(children):
+                    tree.selection_set(children[idx])
+                    tree.see(children[idx])
+
+        tk.Button(win, text="Tutup", command=win.destroy, font=("Segoe UI", 9, "bold"),
+                  padx=10, pady=4, cursor="hand2").pack(pady=(0, 10))
+
+    def quiz_mode(self):
+        if not hasattr(self, 'kamus_data') or not self.kamus_data:
+            messagebox.showwarning("Data Kosong", "Data kamus tidak ditemukan atau kosong.")
+            return
+
+        sel = tk.Toplevel(self.root)
+        sel.title("Pilih Mode Kuis")
+        sel.geometry("380x300")
+        sel.resizable(False, False)
+        sel.grab_set()
+
+        tk.Label(sel, text="Pilih Mode Kuis", font=("Segoe UI", 13, "bold"), pady=10).pack(fill=tk.X)
+        tk.Label(sel, text="Pilih arah terjemahan untuk soal kuis:", font=("Segoe UI", 10)).pack(pady=(12, 6))
+
+        MODE_LIST = [
+            ("Indonesia  →  Sunda",    "indonesia", "sunda"),
+            ("Sunda      →  Indonesia", "sunda",     "indonesia"),
+            ("Inggris   →  Indonesia", "inggris",   "indonesia"),
+            ("Indonesia →  Inggris",   "indonesia", "inggris"),
+        ]
+
+        def mulai_kuis(field_soal, field_jawab):
+            sel.destroy()
+            self._jalankan_kuis(field_soal, field_jawab)
+
+        for label, fs, fj in MODE_LIST:
+            tk.Button(sel, text=label, font=("Segoe UI", 10, "bold"),
+                      padx=10, pady=6, cursor="hand2",
+                      command=lambda f1=fs, f2=fj: mulai_kuis(f1, f2)
+                      ).pack(fill=tk.X, padx=24, pady=4)
+
+        btn_bot = tk.Frame(sel)
+        btn_bot.pack(pady=(8, 6))
+        tk.Button(btn_bot, text="Riwayat Kuis", command=lambda: self.show_quiz_history(),
+                  font=("Segoe UI", 9, "bold"), padx=10, pady=4, cursor="hand2").pack(side=tk.LEFT, padx=4)
+        tk.Button(btn_bot, text="Batal", command=sel.destroy, font=("Segoe UI", 9),
+                  padx=10, pady=4, cursor="hand2").pack(side=tk.LEFT, padx=4)
+
+    def _jalankan_kuis(self, field_soal, field_jawab):
+        entri_valid = [
+            item for item in self.kamus_data
+            if item.get(field_soal, "").strip() and item.get(field_jawab, "").strip()
+        ]
+        if not entri_valid:
+            messagebox.showwarning("Kuis Kosong", "Tidak cukup kosa kata untuk mode ini.")
+            return
+
+        MAX_SOAL = 10
+        LABEL = {"indonesia": "Indonesia", "inggris": "Inggris", "sunda": "Sunda"}
+
+        win = tk.Toplevel(self.root)
+        win.title(f"Kuis {LABEL[field_soal]} → {LABEL[field_jawab]}")
+        win.geometry("480x460")
+        win.resizable(False, False)
+        win.grab_set()
+
+        state = {"benar": 0, "total": 0, "sudah_jawab": False, "kata": None}
+
+        tk.Label(win, text=f"{LABEL[field_soal]} → {LABEL[field_jawab]}",
+                 font=("Segoe UI", 13, "bold"), pady=10).pack(fill=tk.X)
+
+        info_var = tk.StringVar(value=f"Soal 1 / {MAX_SOAL}  |  Skor: 0")
+        tk.Label(win, textvariable=info_var, font=("Segoe UI", 10)).pack(pady=(8, 0))
+
+        soal_var = tk.StringVar()
+        tk.Label(win, textvariable=soal_var, font=("Segoe UI", 13, "bold"),
+                 wraplength=430, pady=16, padx=16).pack(fill=tk.X, padx=14, pady=10)
+
+        tk.Label(win, text=f"Jawab dalam bahasa {LABEL[field_jawab]}:", font=("Segoe UI", 9, "italic")).pack()
+
+        jawaban_var = tk.StringVar()
+        entry_jawab = tk.Entry(win, textvariable=jawaban_var, font=("Segoe UI", 12), justify="center")
+        entry_jawab.pack(fill=tk.X, padx=14, pady=(4, 2))
+
+        hint_var = tk.StringVar(value="Tekan Enter untuk menjawab")
+        tk.Label(win, textvariable=hint_var, font=("Segoe UI", 8, "italic")).pack()
+
+        feedback_var = tk.StringVar()
+        lbl_feedback = tk.Label(win, textvariable=feedback_var, font=("Segoe UI", 10, "bold"))
+        lbl_feedback.pack(pady=4)
+
+        kunci_var = tk.StringVar()
+        tk.Label(win, textvariable=kunci_var, font=("Consolas", 9),
+                 wraplength=440, justify="left").pack(padx=14)
+
+        def tampil_hasil():
+            for w in win.winfo_children(): w.destroy()
+            b, t = state["benar"], state["total"]
+            persen = int(b / t * 100) if t > 0 else 0
+            if persen >= 80:   pesan = "Luar Biasa!"
+            elif persen >= 50: pesan = "Cukup Bagus!"
+            else:              pesan = "Perlu Belajar Lagi!"
+
+            import datetime
+            mode_label = f"{LABEL[field_soal]} → {LABEL[field_jawab]}"
+            self.quiz_history.append({
+                "mode":   mode_label,
+                "benar":  b,
+                "total":  t,
+                "persen": persen,
+                "waktu":  datetime.datetime.now().strftime("%H:%M:%S")
+            })
+
+            tk.Label(win, text="Hasil Kuis", font=("Segoe UI", 14, "bold"), pady=10).pack(fill=tk.X)
+            tk.Label(win, text=pesan, font=("Segoe UI", 18, "bold")).pack(pady=18)
+            tk.Label(win, text=f"{b} / {t} Benar", font=("Segoe UI", 28, "bold")).pack()
+            tk.Label(win, text=f"Persentase: {persen}%", font=("Segoe UI", 11)).pack(pady=(4, 20))
+            tk.Button(win, text="Tutup", command=win.destroy, font=("Segoe UI", 10, "bold"),
+                      padx=16, pady=6, cursor="hand2").pack()
+
+        def soal_baru():
+            if state["total"] >= MAX_SOAL:
+                tampil_hasil()
+                return
+            state["sudah_jawab"] = False
+            item = random.choice(entri_valid)
+            state["kata"] = item
+            nomor = state["total"] + 1
+            kata_soal = item.get(field_soal, "")
+            soal_var.set(f"Apa kata {LABEL[field_jawab]} dari:\n\"{kata_soal}\"?")
+            info_var.set(f"Soal {nomor} / {MAX_SOAL}  |  Skor: {state['benar']}")
+            jawaban_var.set("")
+            feedback_var.set("")
+            kunci_var.set("")
+            hint_var.set("Tekan Enter untuk menjawab")
+            entry_jawab.config(state=tk.NORMAL)
+            entry_jawab.focus()
+
+        def periksa():
+            jawaban = jawaban_var.get().strip().lower()
+            if not jawaban:
+                return
+            item = state["kata"]
+            jawaban_benar = [item.get(field_jawab, "").lower()]
+            for sin in item.get("sinonim", []):
+                jawaban_benar.append(sin.strip().lower())
+
+            state["total"] += 1
+            if jawaban in jawaban_benar:
+                state["benar"] += 1
+                feedback_var.set("Benar! Hebat!")
+                kunci_var.set("")
+            else:
+                feedback_var.set("Salah! Jawaban yang benar:")
+                jawaban_utama = item.get(field_jawab, "")
+                sinonim_str = ", ".join(item.get("sinonim", []))
+                kunci = f"→ {LABEL[field_jawab]}: {jawaban_utama}"
+                if sinonim_str: kunci += f"\n→ Sinonim: {sinonim_str}"
+                kunci_var.set(kunci)
+
+            state["sudah_jawab"] = True
+            entry_jawab.config(state=tk.DISABLED)
+            info_var.set(f"Soal {state['total']} / {MAX_SOAL}  |  Skor: {state['benar']}")
+            if state["total"] >= MAX_SOAL:
+                hint_var.set("Tekan Enter untuk melihat hasil akhir")
+            else:
+                hint_var.set("Tekan Enter untuk soal berikutnya")
+
+        def enter_handler(e):
+            if state.get("sudah_jawab", False):
+                soal_baru()
+            else:
+                periksa()
+
+        entry_jawab.bind("<Return>", enter_handler)
+
+        btn_f = tk.Frame(win)
+        btn_f.pack(pady=8)
+        tk.Button(btn_f, text="Jawab", command=periksa, font=("Segoe UI", 10, "bold"),
+                  padx=12, pady=5, cursor="hand2").pack(side=tk.LEFT, padx=4)
+        tk.Button(btn_f, text="Lewati", command=soal_baru, font=("Segoe UI", 10, "bold"),
+                  padx=12, pady=5, cursor="hand2").pack(side=tk.LEFT, padx=4)
+        tk.Button(btn_f, text="Keluar", command=win.destroy, font=("Segoe UI", 10, "bold"),
+                  padx=12, pady=5, cursor="hand2").pack(side=tk.LEFT, padx=4)
+
+        soal_baru()
+
+    def show_quiz_history(self):
+        win = tk.Toplevel(self.root)
+        win.title("Riwayat Kuis")
+        win.geometry("560x360")
+        win.resizable(False, False)
+
+        tk.Label(win, text="Riwayat Kuis", font=("Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
+
+        cols = ("no", "waktu", "mode", "skor", "persen")
+        tree = ttk.Treeview(win, columns=cols, show="headings", height=9)
+        tree.heading("no",     text="No")
+        tree.heading("waktu",  text="Waktu")
+        tree.heading("mode",   text="Mode")
+        tree.heading("skor",   text="Skor")
+        tree.heading("persen", text="Nilai")
+        tree.column("no",     width=35,  anchor="center")
+        tree.column("waktu",  width=75,  anchor="center")
+        tree.column("mode",   width=210, anchor="w")
+        tree.column("skor",   width=70,  anchor="center")
+        tree.column("persen", width=80,  anchor="center")
+        tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+        if not self.quiz_history:
+            tree.insert("", tk.END, values=("-", "-", "(Belum ada kuis)", "-", "-"))
+        else:
+            for i, rec in enumerate(self.quiz_history, 1):
+                p = rec["persen"]
+                nilai = f"{p}%  {'(Luar Biasa)' if p>=80 else '(Cukup Bagus)' if p>=50 else '(Perlu Belajar)'}"
+                tree.insert("", tk.END, values=(
+                    i,
+                    rec["waktu"],
+                    rec["mode"],
+                    f"{rec['benar']} / {rec['total']}",
+                    nilai
+                ))
+
+        def hapus_semua():
+            self.quiz_history.clear()
+            for row in tree.get_children():
+                tree.delete(row)
+            tree.insert("", tk.END, values=("-", "-", "(Belum ada kuis)", "-", "-"))
+
+        btn_f = tk.Frame(win)
+        btn_f.pack(pady=(0, 10))
+        tk.Button(btn_f, text="Hapus Semua", command=hapus_semua, font=("Segoe UI", 9, "bold"),
+                  padx=10, pady=4, cursor="hand2").pack(side=tk.LEFT, padx=5)
+        tk.Button(btn_f, text="Tutup", command=win.destroy, font=("Segoe UI", 9, "bold"),
+                  padx=10, pady=4, cursor="hand2").pack(side=tk.LEFT, padx=5)
 
 
-if __name__ == "__main__":  # Bagian utama saat script dijalankan (entry point)
-    root = tk.Tk()  # Memulai jendela utama antarmuka tkinter
-    # Memanggil (inisialisasi) kelas KamusApp dengan root sebagai parameter
+if __name__ == "__main__":
+    root = tk.Tk()
     app = KamusApp(root)
-    root.mainloop()  # Memutar infinite loop GUI agar aplikasi tidak langsung tertutup
+    root.mainloop()
