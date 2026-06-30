@@ -3,21 +3,29 @@
         "indonesia": "air",
         "inggris": "water",
         "sunda": "cai",
-        "sinonim": ["tirta"],
+        "sinonim": [
+            "tirta"
+        ],
         "antonim": []
     },
     {
         "indonesia": "api",
         "inggris": "fire",
         "sunda": "seuneu",
-        "sinonim": ["bara"],
-        "antonim": ["air"]
+        "sinonim": [
+            "bara"
+        ],
+        "antonim": [
+            "air"
+        ]
     },
     {
         "indonesia": "apel",
         "inggris": "apple",
         "sunda": "apel",
-        "sinonim": ["buah apel"],
+        "sinonim": [
+            "buah apel"
+        ],
         "antonim": []
     },
     {
@@ -45,7 +53,9 @@
         "indonesia": "buku",
         "inggris": "book",
         "sunda": "buku",
-        "sinonim": ["kitab"],
+        "sinonim": [
+            "kitab"
+        ],
         "antonim": []
     },
     {
@@ -59,14 +69,18 @@
         "indonesia": "komputer",
         "inggris": "computer",
         "sunda": "komputer",
-        "sinonim": ["PC"],
+        "sinonim": [
+            "PC"
+        ],
         "antonim": []
     },
     {
         "indonesia": "mobil",
         "inggris": "car",
         "sunda": "mobil",
-        "sinonim": ["kendaraan"],
+        "sinonim": [
+            "kendaraan"
+        ],
         "antonim": []
     },
     {
@@ -80,36 +94,55 @@
         "indonesia": "rumah",
         "inggris": "house",
         "sunda": "imah",
-        "sinonim": ["hunian", "tempat tinggal"],
+        "sinonim": [
+            "hunian",
+            "tempat tinggal"
+        ],
         "antonim": []
     },
     {
         "indonesia": "sekolah",
         "inggris": "school",
         "sunda": "sakola",
-        "sinonim": ["tempat belajar"],
+        "sinonim": [
+            "tempat belajar"
+        ],
         "antonim": []
     },
     {
         "indonesia": "guru",
         "inggris": "teacher",
         "sunda": "guru",
-        "sinonim": ["pengajar"],
-        "antonim": ["murid"]
+        "sinonim": [
+            "pengajar"
+        ],
+        "antonim": [
+            "murid"
+        ]
     },
     {
         "indonesia": "murid",
         "inggris": "student",
         "sunda": "murid",
-        "sinonim": ["pelajar", "siswa"],
-        "antonim": ["guru"]
+        "sinonim": [
+            "pelajar",
+            "siswa"
+        ],
+        "antonim": [
+            "guru"
+        ]
     },
     {
         "indonesia": "makan",
         "inggris": "eat",
         "sunda": "tuang",
-        "sinonim": ["menyantap", "bersantap"],
-        "antonim": ["puasa"]
+        "sinonim": [
+            "menyantap",
+            "bersantap"
+        ],
+        "antonim": [
+            "puasa"
+        ]
     },
     {
         "indonesia": "minum",
@@ -121,141 +154,229 @@
     {
         "indonesia": "besar",
         "inggris": "big",
-        "sunda": "gedé",
-        "sinonim": ["luas", "raya", "agung"],
-        "antonim": ["kecil"]
+        "sunda": "ged\u00e9",
+        "sinonim": [
+            "luas",
+            "raya",
+            "agung"
+        ],
+        "antonim": [
+            "kecil"
+        ]
     },
     {
         "indonesia": "kecil",
         "inggris": "small",
         "sunda": "leutik",
-        "sinonim": ["mungil", "mini"],
-        "antonim": ["besar"]
+        "sinonim": [
+            "mungil",
+            "mini"
+        ],
+        "antonim": [
+            "besar"
+        ]
     },
     {
         "indonesia": "cepat",
         "inggris": "fast",
         "sunda": "gancang",
-        "sinonim": ["kilat", "laju", "pesat"],
-        "antonim": ["lambat", "pelan"]
+        "sinonim": [
+            "kilat",
+            "laju",
+            "pesat"
+        ],
+        "antonim": [
+            "lambat",
+            "pelan"
+        ]
     },
     {
         "indonesia": "panas",
         "inggris": "hot",
         "sunda": "panas",
-        "sinonim": ["hangat"],
-        "antonim": ["dingin"]
+        "sinonim": [
+            "hangat"
+        ],
+        "antonim": [
+            "dingin"
+        ]
     },
     {
         "indonesia": "dingin",
         "inggris": "cold",
         "sunda": "tiis",
-        "sinonim": ["sejuk"],
-        "antonim": ["panas"]
+        "sinonim": [
+            "sejuk"
+        ],
+        "antonim": [
+            "panas"
+        ]
     },
     {
         "indonesia": "panjang",
         "inggris": "long",
         "sunda": "panjang",
         "sinonim": [],
-        "antonim": ["pendek"]
+        "antonim": [
+            "pendek"
+        ]
     },
     {
         "indonesia": "pendek",
         "inggris": "short",
         "sunda": "pondok",
-        "sinonim": ["singkat"],
-        "antonim": ["panjang"]
+        "sinonim": [
+            "singkat"
+        ],
+        "antonim": [
+            "panjang"
+        ]
     },
     {
         "indonesia": "tinggi",
         "inggris": "high",
         "sunda": "jangkung",
-        "sinonim": ["jangkung"],
-        "antonim": ["rendah"]
+        "sinonim": [
+            "jangkung"
+        ],
+        "antonim": [
+            "rendah"
+        ]
     },
     {
         "indonesia": "rendah",
         "inggris": "low",
         "sunda": "handap",
-        "sinonim": ["pendek"],
-        "antonim": ["tinggi"]
+        "sinonim": [
+            "pendek"
+        ],
+        "antonim": [
+            "tinggi"
+        ]
     },
     {
         "indonesia": "baik",
         "inggris": "good",
         "sunda": "bageur",
-        "sinonim": ["bagus", "elok"],
-        "antonim": ["buruk", "jahat"]
+        "sinonim": [
+            "bagus",
+            "elok"
+        ],
+        "antonim": [
+            "buruk",
+            "jahat"
+        ]
     },
     {
         "indonesia": "buruk",
         "inggris": "bad",
         "sunda": "awon",
-        "sinonim": ["jelek", "jahat"],
-        "antonim": ["baik", "bagus"]
+        "sinonim": [
+            "jelek",
+            "jahat"
+        ],
+        "antonim": [
+            "baik",
+            "bagus"
+        ]
     },
     {
         "indonesia": "cantik",
         "inggris": "beautiful",
         "sunda": "geulis",
-        "sinonim": ["indah", "menawan", "ayu"],
-        "antonim": ["jelek"]
+        "sinonim": [
+            "indah",
+            "menawan",
+            "ayu"
+        ],
+        "antonim": [
+            "jelek"
+        ]
     },
     {
         "indonesia": "tampan",
         "inggris": "handsome",
-        "sunda": "kasép",
-        "sinonim": ["gagah", "rupawan"],
-        "antonim": ["jelek"]
+        "sunda": "kas\u00e9p",
+        "sinonim": [
+            "gagah",
+            "rupawan"
+        ],
+        "antonim": [
+            "jelek"
+        ]
     },
     {
         "indonesia": "tidur",
         "inggris": "sleep",
         "sunda": "kulem",
-        "sinonim": ["terlelap"],
-        "antonim": ["bangun"]
+        "sinonim": [
+            "terlelap"
+        ],
+        "antonim": [
+            "bangun"
+        ]
     },
     {
         "indonesia": "bangun",
         "inggris": "wake up",
         "sunda": "hudang",
-        "sinonim": ["terjaga"],
-        "antonim": ["tidur"]
+        "sinonim": [
+            "terjaga"
+        ],
+        "antonim": [
+            "tidur"
+        ]
     },
     {
         "indonesia": "lari",
         "inggris": "run",
         "sunda": "lumpat",
-        "sinonim": ["berlarian"],
-        "antonim": ["jalan", "berhenti"]
+        "sinonim": [
+            "berlarian"
+        ],
+        "antonim": [
+            "jalan",
+            "berhenti"
+        ]
     },
     {
         "indonesia": "jalan",
         "inggris": "walk",
         "sunda": "leumpang",
-        "sinonim": ["melangkah"],
-        "antonim": ["lari", "berhenti"]
+        "sinonim": [
+            "melangkah"
+        ],
+        "antonim": [
+            "lari",
+            "berhenti"
+        ]
     },
     {
         "indonesia": "baca",
         "inggris": "read",
         "sunda": "maca",
-        "sinonim": ["mengeja"],
+        "sinonim": [
+            "mengeja"
+        ],
         "antonim": []
     },
     {
         "indonesia": "tulis",
         "inggris": "write",
         "sunda": "nulis",
-        "sinonim": ["mencatat", "mengarang"],
+        "sinonim": [
+            "mencatat",
+            "mengarang"
+        ],
         "antonim": []
     },
     {
         "indonesia": "belajar",
         "inggris": "study",
         "sunda": "diajar",
-        "sinonim": ["menuntut ilmu"],
+        "sinonim": [
+            "menuntut ilmu"
+        ],
         "antonim": []
     },
     {
@@ -263,33 +384,46 @@
         "inggris": "morning",
         "sunda": "isuk",
         "sinonim": [],
-        "antonim": ["malam", "sore"]
+        "antonim": [
+            "malam",
+            "sore"
+        ]
     },
     {
         "indonesia": "siang",
         "inggris": "afternoon",
         "sunda": "beurang",
         "sinonim": [],
-        "antonim": ["malam"]
+        "antonim": [
+            "malam"
+        ]
     },
     {
         "indonesia": "sore",
         "inggris": "evening",
         "sunda": "sonten",
-        "sinonim": ["senja", "petang"],
-        "antonim": ["pagi"]
+        "sinonim": [
+            "senja",
+            "petang"
+        ],
+        "antonim": [
+            "pagi"
+        ]
     },
     {
         "indonesia": "malam",
         "inggris": "night",
         "sunda": "peuting",
         "sinonim": [],
-        "antonim": ["pagi", "siang"]
+        "antonim": [
+            "pagi",
+            "siang"
+        ]
     },
     {
         "indonesia": "hari",
         "inggris": "day",
-        "sunda": "poé",
+        "sunda": "po\u00e9",
         "sinonim": [],
         "antonim": []
     },
@@ -319,19 +453,25 @@
         "inggris": "white",
         "sunda": "bodas",
         "sinonim": [],
-        "antonim": ["hitam"]
+        "antonim": [
+            "hitam"
+        ]
     },
     {
         "indonesia": "hitam",
         "inggris": "black",
         "sunda": "hideung",
-        "sinonim": ["gelap"],
-        "antonim": ["putih"]
+        "sinonim": [
+            "gelap"
+        ],
+        "antonim": [
+            "putih"
+        ]
     },
     {
         "indonesia": "hijau",
         "inggris": "green",
-        "sunda": "héjo",
+        "sunda": "h\u00e9jo",
         "sinonim": [],
         "antonim": []
     },
@@ -345,7 +485,7 @@
     {
         "indonesia": "kuning",
         "inggris": "yellow",
-        "sunda": "konéng",
+        "sunda": "kon\u00e9ng",
         "sinonim": [],
         "antonim": []
     },
@@ -353,34 +493,55 @@
         "indonesia": "ayah",
         "inggris": "father",
         "sunda": "bapa",
-        "sinonim": ["bapak", "papa", "abati"],
-        "antonim": ["ibu"]
+        "sinonim": [
+            "bapak",
+            "papa",
+            "abati"
+        ],
+        "antonim": [
+            "ibu"
+        ]
     },
     {
         "indonesia": "ibu",
         "inggris": "mother",
         "sunda": "indung",
-        "sinonim": ["bunda", "mama", "ummi"],
-        "antonim": ["ayah"]
+        "sinonim": [
+            "bunda",
+            "mama",
+            "ummi"
+        ],
+        "antonim": [
+            "ayah"
+        ]
     },
     {
         "indonesia": "anak",
         "inggris": "child",
         "sunda": "budak",
-        "sinonim": ["putra", "bocah"],
-        "antonim": ["orang tua"]
+        "sinonim": [
+            "putra",
+            "bocah"
+        ],
+        "antonim": [
+            "orang tua"
+        ]
     },
     {
         "indonesia": "uang",
         "inggris": "money",
         "sunda": "duit",
-        "sinonim": ["dana", "harta", "cuan"],
+        "sinonim": [
+            "dana",
+            "harta",
+            "cuan"
+        ],
         "antonim": []
     },
     {
         "indonesia": "meja",
         "inggris": "table",
-        "sunda": "méja",
+        "sunda": "m\u00e9ja",
         "sinonim": [],
         "antonim": []
     },
@@ -388,20 +549,25 @@
         "indonesia": "kursi",
         "inggris": "chair",
         "sunda": "korsi",
-        "sinonim": ["bangku", "tempat duduk"],
+        "sinonim": [
+            "bangku",
+            "tempat duduk"
+        ],
         "antonim": []
     },
     {
         "indonesia": "pintu",
         "inggris": "door",
         "sunda": "panto",
-        "sinonim": ["gerbang"],
+        "sinonim": [
+            "gerbang"
+        ],
         "antonim": []
     },
     {
         "indonesia": "jendela",
         "inggris": "window",
-        "sunda": "jandéla",
+        "sunda": "jand\u00e9la",
         "sinonim": [],
         "antonim": []
     },
@@ -409,77 +575,888 @@
         "indonesia": "kemaluan",
         "inggris": "genitals",
         "sunda": "palawangan",
-        "sinonim": ["alat kelamin", "aurat"],
+        "sinonim": [
+            "alat kelamin",
+            "aurat"
+        ],
         "antonim": []
     },
     {
         "indonesia": "penis",
         "inggris": "penis",
         "sunda": "kontol",
-        "sinonim": ["zakar", "kemaluan pria", "alat kelamin laki-laki", "burung"],
-        "antonim": ["vagina"]
+        "sinonim": [
+            "zakar",
+            "kemaluan pria",
+            "alat kelamin laki-laki",
+            "burung"
+        ],
+        "antonim": [
+            "vagina"
+        ]
     },
     {
         "indonesia": "vagina",
         "inggris": "vagina",
         "sunda": "memek",
-        "sinonim": ["puki", "kemaluan wanita", "alat kelamin perempuan"],
-        "antonim": ["penis"]
+        "sinonim": [
+            "puki",
+            "kemaluan wanita",
+            "alat kelamin perempuan"
+        ],
+        "antonim": [
+            "penis"
+        ]
     },
     {
         "indonesia": "testis",
         "inggris": "testicle",
         "sunda": "kanjut",
-        "sinonim": ["buah zakar", "pelir", "biji kemaluan", "pisitan"],
+        "sinonim": [
+            "buah zakar",
+            "pelir",
+            "biji kemaluan",
+            "pisitan"
+        ],
         "antonim": []
     },
     {
         "indonesia": "rahim",
         "inggris": "uterus",
         "sunda": "kandungan",
-        "sinonim": ["womb", "kandungan"],
+        "sinonim": [
+            "womb",
+            "kandungan"
+        ],
         "antonim": []
     },
     {
         "indonesia": "payudara",
         "inggris": "breast",
         "sunda": "susu",
-        "sinonim": ["buah dada", "tetek", "pinarep"],
+        "sinonim": [
+            "buah dada",
+            "tetek",
+            "pinarep"
+        ],
         "antonim": []
     },
     {
         "indonesia": "pantat",
         "inggris": "buttocks",
         "sunda": "bujur",
-        "sinonim": ["bokong", "pantat"],
+        "sinonim": [
+            "bokong",
+            "pantat"
+        ],
         "antonim": []
     },
     {
         "indonesia": "sperma",
         "inggris": "sperm",
         "sunda": "peju",
-        "sinonim": ["air mani", "benih", "mani"],
-        "antonim": ["sel telur"]
+        "sinonim": [
+            "air mani",
+            "benih",
+            "mani"
+        ],
+        "antonim": [
+            "sel telur"
+        ]
     },
     {
         "indonesia": "sel telur",
         "inggris": "ovum",
         "sunda": "sel endog",
-        "sinonim": ["indung telur"],
-        "antonim": ["sperma"]
+        "sinonim": [
+            "indung telur"
+        ],
+        "antonim": [
+            "sperma"
+        ]
     },
     {
         "indonesia": "klitoris",
         "inggris": "clitoris",
         "sunda": "itil",
-        "sinonim": ["kelentit"],
+        "sinonim": [
+            "kelentit"
+        ],
         "antonim": []
     },
     {
         "indonesia": "selangkangan",
         "inggris": "groin",
         "sunda": "palangkakan",
-        "sinonim": ["paha dalam"],
+        "sinonim": [
+            "paha dalam"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "kucing",
+        "inggris": "cat",
+        "sunda": "ucing",
+        "sinonim": [
+            "meong"
+        ],
+        "antonim": [
+            "anjing"
+        ]
+    },
+    {
+        "indonesia": "tikus",
+        "inggris": "mouse",
+        "sunda": "beurit",
+        "sinonim": [
+            "curut"
+        ],
+        "antonim": [
+            "kucing"
+        ]
+    },
+    {
+        "indonesia": "sapi",
+        "inggris": "cow",
+        "sunda": "sapi",
+        "sinonim": [
+            "lembu"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "kambing",
+        "inggris": "goat",
+        "sunda": "embe",
+        "sinonim": [
+            "domba"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "kuda",
+        "inggris": "horse",
+        "sunda": "kuda",
+        "sinonim": [
+            "kuda"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "ikan",
+        "inggris": "fish",
+        "sunda": "lauk",
+        "sinonim": [
+            "iwak"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "bebek",
+        "inggris": "duck",
+        "sunda": "meri",
+        "sinonim": [
+            "itik"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "lompat",
+        "inggris": "jump",
+        "sunda": "luncat",
+        "sinonim": [
+            "loncat"
+        ],
+        "antonim": [
+            "diam"
+        ]
+    },
+    {
+        "indonesia": "renang",
+        "inggris": "swim",
+        "sunda": "ngojay",
+        "sinonim": [
+            "berenang"
+        ],
+        "antonim": [
+            "tenggelam"
+        ]
+    },
+    {
+        "indonesia": "lihat",
+        "inggris": "see",
+        "sunda": "tempo",
+        "sinonim": [
+            "pandang",
+            "nonton",
+            "tonton"
+        ],
+        "antonim": [
+            "tutup mata"
+        ]
+    },
+    {
+        "indonesia": "dengar",
+        "inggris": "hear",
+        "sunda": "denge",
+        "sinonim": [
+            "simak",
+            "rungu"
+        ],
+        "antonim": [
+            "tuli"
+        ]
+    },
+    {
+        "indonesia": "rasa",
+        "inggris": "feel",
+        "sunda": "rasa",
+        "sinonim": [
+            "kecap",
+            "alami"
+        ],
+        "antonim": [
+            "kebas"
+        ]
+    },
+    {
+        "indonesia": "pegang",
+        "inggris": "hold",
+        "sunda": "cekel",
+        "sinonim": [
+            "genggam",
+            "sentuh"
+        ],
+        "antonim": [
+            "lepas"
+        ]
+    },
+    {
+        "indonesia": "lempar",
+        "inggris": "throw",
+        "sunda": "baledog",
+        "sinonim": [
+            "buang"
+        ],
+        "antonim": [
+            "tangkap"
+        ]
+    },
+    {
+        "indonesia": "tangkap",
+        "inggris": "catch",
+        "sunda": "tewak",
+        "sinonim": [
+            "ambil"
+        ],
+        "antonim": [
+            "lempar"
+        ]
+    },
+    {
+        "indonesia": "masak",
+        "inggris": "cook",
+        "sunda": "masak",
+        "sinonim": [
+            "olah"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "cuci",
+        "inggris": "wash",
+        "sunda": "kumbah",
+        "sinonim": [
+            "bersihkan"
+        ],
+        "antonim": [
+            "kotori"
+        ]
+    },
+    {
+        "indonesia": "sapu",
+        "inggris": "sweep",
+        "sunda": "sasapu",
+        "sinonim": [
+            "bersihkan"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "langit",
+        "inggris": "sky",
+        "sunda": "langit",
+        "sinonim": [
+            "angkasa"
+        ],
+        "antonim": [
+            "bumi"
+        ]
+    },
+    {
+        "indonesia": "bumi",
+        "inggris": "earth",
+        "sunda": "bumi",
+        "sinonim": [
+            "dunia",
+            "tanah"
+        ],
+        "antonim": [
+            "langit"
+        ]
+    },
+    {
+        "indonesia": "bintang",
+        "inggris": "star",
+        "sunda": "bentang",
+        "sinonim": [
+            "kejora"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "matahari",
+        "inggris": "sun",
+        "sunda": "panonpoe",
+        "sinonim": [
+            "mentari",
+            "surya"
+        ],
+        "antonim": [
+            "bulan"
+        ]
+    },
+    {
+        "indonesia": "hujan",
+        "inggris": "rain",
+        "sunda": "hujan",
+        "sinonim": [
+            "gerimis",
+            "air hujan"
+        ],
+        "antonim": [
+            "kemarau"
+        ]
+    },
+    {
+        "indonesia": "angin",
+        "inggris": "wind",
+        "sunda": "angin",
+        "sinonim": [
+            "udara",
+            "bayu"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "batu",
+        "inggris": "stone",
+        "sunda": "batu",
+        "sinonim": [
+            "kerikil"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "tanah",
+        "inggris": "soil",
+        "sunda": "taneuh",
+        "sinonim": [
+            "bumi"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "pasir",
+        "inggris": "sand",
+        "sunda": "keusik",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "laut",
+        "inggris": "sea",
+        "sunda": "laut",
+        "sinonim": [
+            "samudera",
+            "bahari"
+        ],
+        "antonim": [
+            "darat"
+        ]
+    },
+    {
+        "indonesia": "sungai",
+        "inggris": "river",
+        "sunda": "walungan",
+        "sinonim": [
+            "kali",
+            "susukan"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "gunung",
+        "inggris": "mountain",
+        "sunda": "gunung",
+        "sinonim": [
+            "bukit"
+        ],
+        "antonim": [
+            "lembah"
+        ]
+    },
+    {
+        "indonesia": "hutan",
+        "inggris": "forest",
+        "sunda": "leuweung",
+        "sinonim": [
+            "rimba",
+            "alas"
+        ],
+        "antonim": [
+            "kota"
+        ]
+    },
+    {
+        "indonesia": "pohon",
+        "inggris": "tree",
+        "sunda": "tangkal",
+        "sinonim": [
+            "kayu"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "daun",
+        "inggris": "leaf",
+        "sunda": "daun",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "bunga",
+        "inggris": "flower",
+        "sunda": "kembang",
+        "sinonim": [
+            "puspa",
+            "kusuma"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "buah",
+        "inggris": "fruit",
+        "sunda": "buah",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "kuat",
+        "inggris": "strong",
+        "sunda": "kuat",
+        "sinonim": [
+            "kokoh",
+            "tangguh"
+        ],
+        "antonim": [
+            "lemah"
+        ]
+    },
+    {
+        "indonesia": "lemah",
+        "inggris": "weak",
+        "sunda": "leuleus",
+        "sinonim": [
+            "rapuh"
+        ],
+        "antonim": [
+            "kuat"
+        ]
+    },
+    {
+        "indonesia": "keras",
+        "inggris": "hard",
+        "sunda": "teuas",
+        "sinonim": [
+            "kaku"
+        ],
+        "antonim": [
+            "lunak",
+            "lembut"
+        ]
+    },
+    {
+        "indonesia": "lunak",
+        "inggris": "soft",
+        "sunda": "hipu",
+        "sinonim": [
+            "lembek"
+        ],
+        "antonim": [
+            "keras"
+        ]
+    },
+    {
+        "indonesia": "manis",
+        "inggris": "sweet",
+        "sunda": "amis",
+        "sinonim": [
+            "legit"
+        ],
+        "antonim": [
+            "pahit"
+        ]
+    },
+    {
+        "indonesia": "pahit",
+        "inggris": "bitter",
+        "sunda": "pait",
+        "sinonim": [],
+        "antonim": [
+            "manis"
+        ]
+    },
+    {
+        "indonesia": "asam",
+        "inggris": "sour",
+        "sunda": "haseum",
+        "sinonim": [
+            "kecut"
+        ],
+        "antonim": [
+            "manis"
+        ]
+    },
+    {
+        "indonesia": "asin",
+        "inggris": "salty",
+        "sunda": "asin",
+        "sinonim": [],
+        "antonim": [
+            "tawar"
+        ]
+    },
+    {
+        "indonesia": "pedas",
+        "inggris": "spicy",
+        "sunda": "lada",
+        "sinonim": [],
+        "antonim": [
+            "hambar"
+        ]
+    },
+    {
+        "indonesia": "tajam",
+        "inggris": "sharp",
+        "sunda": "seukeut",
+        "sinonim": [
+            "runcing"
+        ],
+        "antonim": [
+            "tumpul"
+        ]
+    },
+    {
+        "indonesia": "tumpul",
+        "inggris": "blunt",
+        "sunda": "mintul",
+        "sinonim": [
+            "tumpal"
+        ],
+        "antonim": [
+            "tajam"
+        ]
+    },
+    {
+        "indonesia": "terang",
+        "inggris": "bright",
+        "sunda": "caang",
+        "sinonim": [
+            "bercahaya"
+        ],
+        "antonim": [
+            "gelap"
+        ]
+    },
+    {
+        "indonesia": "gelap",
+        "inggris": "dark",
+        "sunda": "poek",
+        "sinonim": [
+            "gulita"
+        ],
+        "antonim": [
+            "terang"
+        ]
+    },
+    {
+        "indonesia": "bersih",
+        "inggris": "clean",
+        "sunda": "beresih",
+        "sinonim": [
+            "suci",
+            "bening"
+        ],
+        "antonim": [
+            "kotor"
+        ]
+    },
+    {
+        "indonesia": "kotor",
+        "inggris": "dirty",
+        "sunda": "kotor",
+        "sinonim": [
+            "cemar"
+        ],
+        "antonim": [
+            "bersih"
+        ]
+    },
+    {
+        "indonesia": "wangi",
+        "inggris": "fragrant",
+        "sunda": "seungit",
+        "sinonim": [
+            "harum",
+            "semerbak"
+        ],
+        "antonim": [
+            "bau"
+        ]
+    },
+    {
+        "indonesia": "bau",
+        "inggris": "smelly",
+        "sunda": "bau",
+        "sinonim": [
+            "busuk",
+            "apek"
+        ],
+        "antonim": [
+            "wangi"
+        ]
+    },
+    {
+        "indonesia": "detik",
+        "inggris": "second",
+        "sunda": "detik",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "menit",
+        "inggris": "minute",
+        "sunda": "menit",
+        "sinonim": [],
+        "antonim": []
+    },
+    {
+        "indonesia": "jam",
+        "inggris": "hour",
+        "sunda": "jam",
+        "sinonim": [
+            "waktu"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "minggu",
+        "inggris": "week",
+        "sunda": "minggu",
+        "sinonim": [
+            "pekan"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "abad",
+        "inggris": "century",
+        "sunda": "abad",
+        "sinonim": [
+            "seratus tahun"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "sekarang",
+        "inggris": "now",
+        "sunda": "ayeuna",
+        "sinonim": [
+            "kini",
+            "saat ini"
+        ],
+        "antonim": [
+            "nanti",
+            "kemarin"
+        ]
+    },
+    {
+        "indonesia": "nanti",
+        "inggris": "later",
+        "sunda": "engke",
+        "sinonim": [
+            "kelak"
+        ],
+        "antonim": [
+            "sekarang"
+        ]
+    },
+    {
+        "indonesia": "kemarin",
+        "inggris": "yesterday",
+        "sunda": "kamari",
+        "sinonim": [],
+        "antonim": [
+            "besok"
+        ]
+    },
+    {
+        "indonesia": "besok",
+        "inggris": "tomorrow",
+        "sunda": "isuk",
+        "sinonim": [
+            "esok"
+        ],
+        "antonim": [
+            "kemarin"
+        ]
+    },
+    {
+        "indonesia": "kepala",
+        "inggris": "head",
+        "sunda": "sirah",
+        "sinonim": [
+            "mastaka"
+        ],
+        "antonim": [
+            "kaki"
+        ]
+    },
+    {
+        "indonesia": "mata",
+        "inggris": "eye",
+        "sunda": "panon",
+        "sinonim": [
+            "soca"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "hidung",
+        "inggris": "nose",
+        "sunda": "irung",
+        "sinonim": [
+            "pangambung"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "mulut",
+        "inggris": "mouth",
+        "sunda": "sungut",
+        "sinonim": [
+            "lambey",
+            "bibir"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "telinga",
+        "inggris": "ear",
+        "sunda": "ceuli",
+        "sinonim": [
+            "cepil",
+            "kuping"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "rambut",
+        "inggris": "hair",
+        "sunda": "buuk",
+        "sinonim": [
+            "rambut",
+            "bulu"
+        ],
+        "antonim": [
+            "botak"
+        ]
+    },
+    {
+        "indonesia": "tangan",
+        "inggris": "hand",
+        "sunda": "leungeun",
+        "sinonim": [
+            "panangan"
+        ],
+        "antonim": [
+            "kaki"
+        ]
+    },
+    {
+        "indonesia": "kaki",
+        "inggris": "foot",
+        "sunda": "suku",
+        "sinonim": [
+            "sampean"
+        ],
+        "antonim": [
+            "tangan",
+            "kepala"
+        ]
+    },
+    {
+        "indonesia": "perut",
+        "inggris": "stomach",
+        "sunda": "beuteung",
+        "sinonim": [
+            "patuangan",
+            "lambung"
+        ],
+        "antonim": [
+            "punggung"
+        ]
+    },
+    {
+        "indonesia": "punggung",
+        "inggris": "back",
+        "sunda": "tonggong",
+        "sinonim": [
+            "belakang"
+        ],
+        "antonim": [
+            "perut",
+            "dada"
+        ]
+    },
+    {
+        "indonesia": "dada",
+        "inggris": "chest",
+        "sunda": "dada",
+        "sinonim": [
+            "payudara"
+        ],
+        "antonim": [
+            "punggung"
+        ]
+    },
+    {
+        "indonesia": "jari",
+        "inggris": "finger",
+        "sunda": "ramo",
+        "sinonim": [
+            "jemari"
+        ],
+        "antonim": []
+    },
+    {
+        "indonesia": "kuku",
+        "inggris": "nail",
+        "sunda": "kuku",
+        "sinonim": [
+            "tangkay"
+        ],
         "antonim": []
     }
 ]
