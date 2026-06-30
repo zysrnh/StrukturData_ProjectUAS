@@ -132,34 +132,43 @@ def levenshtein_distance(s1, s2):
     return previous_row[-1]
 
 
-def get_fuzzy_suggestions(word, candidates, max_suggestions=4):
-    # Tentukan toleransi typo berdasarkan panjang kata
-    if len(word) <= 4:
-        max_distance = 1
-    elif len(word) <= 7:
-        max_distance = 2
-    else:
-        max_distance = 3
+def get_fuzzy_suggestions(word, candidates, max_suggestions=5): # Fungsi mencari kata-kata yang mirip dengan input (untuk koreksi typo)
+    # Tentukan toleransi typo berdasarkan panjang kata yang diketik user
+    if len(word) <= 2: # Kata sangat pendek (1-2 huruf)
+        max_distance = 1 # Toleransi hanya 1 perubahan
+    elif len(word) <= 4: # Kata pendek (3-4 huruf) contoh: "ayr" -> "air"
+        max_distance = 2 # Toleransi 2 perubahan agar lebih fleksibel
+    elif len(word) <= 7: # Kata sedang (5-7 huruf) contoh: "ceapt" -> "cepat"
+        max_distance = 2 # Toleransi 2 perubahan
+    else: # Kata panjang (8+ huruf) contoh: "komputre" -> "komputer"
+        max_distance = 3 # Toleransi 3 perubahan
 
-    matches = []
-    for candidate in candidates:
+    matches = [] # List untuk menampung pasangan (kata_kandidat, jarak_levenshtein)
+    for candidate in candidates: # Iterasi seluruh kata di Hash Table
+        # Skip kata yang panjangnya terlalu jauh berbeda (hemat performa)
         if abs(len(candidate) - len(word)) > max_distance:
-            continue
-        dist = levenshtein_distance(word, candidate)
-        if dist <= max_distance:
-            matches.append((candidate, dist))
+            continue # Lewati kandidat ini
+        dist = levenshtein_distance(word, candidate) # Hitung jarak Levenshtein
+        if dist <= max_distance and dist > 0: # Jika jaraknya dalam toleransi dan bukan kata yang persis sama
+            # Beri bonus skor jika 2 huruf awal sama (kemungkinan besar benar)
+            prefix_bonus = 0 # Inisialisasi bonus awal
+            if len(word) >= 2 and len(candidate) >= 2: # Pastikan kedua kata cukup panjang
+                if word[:2] == candidate[:2]: # Jika 2 huruf pertama sama
+                    prefix_bonus = -0.5 # Kurangi skor (semakin kecil = semakin mirip)
+            matches.append((candidate, dist + prefix_bonus)) # Tambahkan ke daftar dengan skor akhir
 
-    matches.sort(key=lambda item: (item[1], item[0]))
-    if matches:
-        return matches[:max_suggestions]
+    matches.sort(key=lambda item: (item[1], item[0])) # Urutkan berdasarkan skor (kecil = lebih mirip), lalu abjad
+    if matches: # Jika ditemukan kandidat
+        # Ubah skor kembali ke integer untuk tampilan yang bersih
+        return [(w, int(d)) for w, d in matches[:max_suggestions]]
 
-    # Fallback ke difflib jika custom Levenshtein tidak menemukan hasil
-    close_matches = difflib.get_close_matches(
-        word, list(candidates), n=max_suggestions, cutoff=0.6)
-    fallback = [(candidate, levenshtein_distance(word, candidate))
+    # Fallback: Gunakan difflib jika Levenshtein tidak menemukan hasil
+    close_matches = difflib.get_close_matches( # Cari kecocokan menggunakan algoritma SequenceMatcher
+        word, list(candidates), n=max_suggestions, cutoff=0.45) # cutoff rendah agar lebih permisif
+    fallback = [(candidate, levenshtein_distance(word, candidate)) # Hitung ulang jarak untuk tampilan
                 for candidate in close_matches]
-    fallback.sort(key=lambda item: (item[1], item[0]))
-    return fallback[:max_suggestions]
+    fallback.sort(key=lambda item: (item[1], item[0])) # Urutkan hasil
+    return fallback[:max_suggestions] # Kembalikan maksimal 5 saran
 
 # ==========================================
 # 4. KELAS APLIKASI GUI UTAMA
