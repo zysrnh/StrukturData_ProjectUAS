@@ -1,0 +1,14 @@
+# Python Bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Lingkungan Virtual (Opsional, barangkali butuh)
+venv/
+env/
+.env
+
+# Editor
+.vscode/
+.idea/
