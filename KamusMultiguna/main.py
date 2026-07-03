@@ -19,43 +19,57 @@ from modules.HashTable import HashTable
 class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
     def __init__(self, root):  # Konstruktor: dipanggil saat aplikasi pertama dijalankan
         self.root = root                     # Simpan referensi jendela utama Tkinter
-        self.root.title("Kamus Multi Guna")  # Judul yang tampil di title bar jendela
+        # Judul yang tampil di title bar jendela
+        self.root.title("Kamus Multi Guna")
 
-        self.hash_table   = HashTable()               # Hash Table: penyimpanan utama data kamus O(1)
-        self.trie         = Trie()           # Trie: struktur untuk autocomplete
-        self.history      = DoublyLinkedList() # DLL: navigasi riwayat pencarian
-        self.favorites    = set()            # Set: daftar kata favorit (tidak duplikat)
+        # Hash Table: penyimpanan utama data kamus O(1)
+        self.hash_table = HashTable()
+        self.trie = Trie()           # Trie: struktur untuk autocomplete
+        self.history = DoublyLinkedList()  # DLL: navigasi riwayat pencarian
+        self.favorites = set()            # Set: daftar kata favorit (tidak duplikat)
         self.quiz_history = []               # List: menyimpan hasil sesi kuis
 
-        self.root.configure(bg="#f0f2f5")      # Terapkan warna latar belakang utama
-        self.root.geometry("760x620")          # Ukuran jendela: lebar x tinggi (pixel)
-        self.root.resizable(False, False)      # Larang pengubahan ukuran jendela
+        # Terapkan warna latar belakang utama
+        self.root.configure(bg="#f0f2f5")
+        # Ukuran jendela: lebar x tinggi (pixel)
+        self.root.geometry("760x620")
+        # Larang pengubahan ukuran jendela
+        self.root.resizable(False, False)
 
-        self.load_data()        # Muat data kamus dari file JSON ke struktur data
-        self.show_welcome_screen() # Tampilkan halaman selamat datang terlebih dahulu
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.favorite_file_path = os.path.join(
+            script_dir, "dataset", "favorites.json")
+        self.load_favorites()                 # Muat daftar favorit dari file JSON
+        self.load_data()                      # Muat data kamus dari file JSON ke struktur data
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+        # Tampilkan halaman selamat datang terlebih dahulu
+        self.show_welcome_screen()
 
     def show_welcome_screen(self):
         # Frame penutup seluruh jendela untuk halaman awal
         self.welcome_frame = tk.Frame(self.root, bg="#1e3a5f")
         self.welcome_frame.pack(fill=tk.BOTH, expand=True)
-        
-        tk.Label(self.welcome_frame, bg="#1e3a5f").pack(pady=70) # Jarak atas
-        
+
+        tk.Label(self.welcome_frame, bg="#1e3a5f").pack(pady=70)  # Jarak atas
+
         # Judul Besar
-        tk.Label(self.welcome_frame, text="Kamus Multi Guna", font=("Segoe UI", 32, "bold"), fg="white", bg="#1e3a5f").pack(pady=(0, 10))
-        tk.Label(self.welcome_frame, text="Indonesia · Inggris · Sunda", font=("Segoe UI", 14), fg="#93c5fd", bg="#1e3a5f").pack(pady=(0, 40))
-        
+        tk.Label(self.welcome_frame, text="Kamus Multi Guna", font=(
+            "Segoe UI", 32, "bold"), fg="white", bg="#1e3a5f").pack(pady=(0, 10))
+        tk.Label(self.welcome_frame, text="Indonesia · Inggris · Sunda", font=(
+            "Segoe UI", 14), fg="#93c5fd", bg="#1e3a5f").pack(pady=(0, 40))
+
         # Deskripsi
         desc = "Aplikasi kamus pintar terintegrasi algoritma cerdas\n(Autocomplete, Typo Correction, dan Mode Kuis)."
-        tk.Label(self.welcome_frame, text=desc, font=("Segoe UI", 12), fg="#cbd5e1", bg="#1e3a5f", justify="center").pack(pady=(0, 50))
-        
+        tk.Label(self.welcome_frame, text=desc, font=("Segoe UI", 12),
+                 fg="#cbd5e1", bg="#1e3a5f", justify="center").pack(pady=(0, 50))
+
         # Tombol Mulai
-        btn_mulai = tk.Button(self.welcome_frame, text="Mulai Belajar", font=("Segoe UI", 12, "bold"), bg="#2563eb", fg="white", 
-                  padx=30, pady=10, relief=tk.FLAT, cursor="hand2", command=self.start_app)
+        btn_mulai = tk.Button(self.welcome_frame, text="Mulai Belajar", font=("Segoe UI", 12, "bold"), bg="#2563eb", fg="white",
+                              padx=30, pady=10, relief=tk.FLAT, cursor="hand2", command=self.start_app)
         btn_mulai.pack()
 
     def start_app(self):
-        self.welcome_frame.destroy() # Hapus halaman awal
+        self.welcome_frame.destroy()  # Hapus halaman awal
         self.create_widgets()        # Muat antarmuka utama kamus
 
     # ─────────────────────────────────────────────
@@ -63,24 +77,33 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
     # Membaca file kamus.json dan mengisi Hash Table & Trie
     # ─────────────────────────────────────────────
     def load_data(self):  # Fungsi memuat dan memparsing data kamus dari file JSON
-        script_dir  = os.path.dirname(os.path.abspath(__file__)) # Dapatkan folder lokasi script
-        path_kamus  = os.path.join(script_dir, "dataset", "kamus.json") # Rangkai path file kamus
+        script_dir = os.path.dirname(os.path.abspath(
+            __file__))  # Dapatkan folder lokasi script
+        # Rangkai path file kamus
+        path_kamus = os.path.join(script_dir, "dataset", "kamus.json")
         self.kamus_data = []   # Inisialisasi list data mentah untuk keperluan mode kuis
 
         if os.path.exists(path_kamus):  # Cek apakah file kamus.json ada
-            with open(path_kamus, 'r', encoding='utf-8') as f: # Buka file dengan encoding UTF-8
+            with open(path_kamus, 'r', encoding='utf-8') as f:  # Buka file dengan encoding UTF-8
                 data = json.load(f)          # Parse JSON menjadi list Python
                 self.kamus_data = data       # Simpan data mentah untuk kuis
                 for item in data:            # Iterasi setiap entri kata
-                    indonesia = item.get("indonesia", "") # Ambil kata dalam bahasa Indonesia
-                    inggris   = item.get("inggris",   "") # Ambil kata dalam bahasa Inggris
-                    sunda     = item.get("sunda",     "") # Ambil kata dalam bahasa Sunda
-                    sinonim   = ", ".join(item.get("sinonim", [])) # Gabung daftar sinonim
-                    antonim   = ", ".join(item.get("antonim", [])) # Gabung daftar antonim
+                    # Ambil kata dalam bahasa Indonesia
+                    indonesia = item.get("indonesia", "")
+                    # Ambil kata dalam bahasa Inggris
+                    inggris = item.get("inggris",   "")
+                    # Ambil kata dalam bahasa Sunda
+                    sunda = item.get("sunda",     "")
+                    # Gabung daftar sinonim
+                    sinonim = ", ".join(item.get("sinonim", []))
+                    # Gabung daftar antonim
+                    antonim = ", ".join(item.get("antonim", []))
 
                     arti_teks = f"\n- Indonesia: {indonesia}\n- Inggris: {inggris}\n- Sunda: {sunda}"
-                    if sinonim: arti_teks += f"\n- Sinonim: {sinonim}"
-                    if antonim: arti_teks += f"\n- Antonim: {antonim}"
+                    if sinonim:
+                        arti_teks += f"\n- Sinonim: {sinonim}"
+                    if antonim:
+                        arti_teks += f"\n- Antonim: {antonim}"
 
                     def tambah_kata(kata):
                         if kata:
@@ -92,26 +115,64 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                     tambah_kata(inggris)
                     tambah_kata(sunda)
 
+    def load_favorites(self):
+        if not hasattr(self, "favorite_file_path"):
+            return
+
+        if os.path.exists(self.favorite_file_path):
+            try:
+                with open(self.favorite_file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if isinstance(data, list):
+                    self.favorites = {str(item).strip().lower()
+                                      for item in data if str(item).strip()}
+                else:
+                    self.favorites = set()
+            except (json.JSONDecodeError, OSError):
+                self.favorites = set()
+        else:
+            self.favorites = set()
+
+    def save_favorites(self):
+        if not hasattr(self, "favorite_file_path"):
+            return
+
+        try:
+            os.makedirs(os.path.dirname(
+                self.favorite_file_path), exist_ok=True)
+            with open(self.favorite_file_path, "w", encoding="utf-8") as f:
+                json.dump(sorted(self.favorites), f,
+                          ensure_ascii=False, indent=2)
+                f.write("\n")
+        except OSError:
+            pass
+
+    def on_close(self):
+        self.save_favorites()
+        self.root.destroy()
+
     # ─────────────────────────────────────────────
     # MODUL 4A: PEMBUATAN WIDGET GUI UTAMA
     # Membangun semua elemen tampilan jendela utama
     # ─────────────────────────────────────────────
     def create_widgets(self):
         # == Palet warna tema "Kalem" (muted steel-blue) ==
-        C_BG     = "#f0f2f5"   # Abu-abu terang untuk latar belakang utama
-        C_PANEL  = "#ffffff"   # Putih bersih untuk panel/kartu
+        C_BG = "#f0f2f5"   # Abu-abu terang untuk latar belakang utama
+        C_PANEL = "#ffffff"   # Putih bersih untuk panel/kartu
         C_ACCENT = "#2563eb"   # Biru korporat sebagai warna aksen utama
         C_HEADER = "#1e3a5f"   # Biru tua gelap untuk header
-        C_TEXT   = "#1e293b"   # Teks utama hampir hitam
-        C_MUTED  = "#64748b"   # Teks sekunder abu-abu medium
+        C_TEXT = "#1e293b"   # Teks utama hampir hitam
+        C_MUTED = "#64748b"   # Teks sekunder abu-abu medium
         C_BORDER = "#cbd5e1"   # Garis batas abu-abu muda
-        C_BTN    = "#334155"   # Tombol standar abu gelap
-        C_INPUT  = "#ffffff"   # Latar kotak input putih
+        C_BTN = "#334155"   # Tombol standar abu gelap
+        C_INPUT = "#ffffff"   # Latar kotak input putih
         C_RESULT = "#f8fafc"   # Latar area hasil sangat terang
 
         # == BAGIAN HEADER: Judul aplikasi ==
-        header = tk.Frame(self.root, bg=C_HEADER, pady=14) # Frame header biru tua
-        header.pack(fill=tk.X)                # Bentangkan penuh secara horizontal
+        # Frame header biru tua
+        header = tk.Frame(self.root, bg=C_HEADER, pady=14)
+        # Bentangkan penuh secara horizontal
+        header.pack(fill=tk.X)
         tk.Label(                             # Label judul utama
             header, text="Kamus Multi Guna",
             font=("Segoe UI", 15, "bold"), bg=C_HEADER, fg="white"
@@ -122,23 +183,28 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         ).pack()
 
         # == BAGIAN PENCARIAN: Kotak input + tombol cari ==
-        sf = tk.Frame(self.root, bg=C_PANEL, padx=18, pady=12, # Frame area pencarian
+        sf = tk.Frame(self.root, bg=C_PANEL, padx=18, pady=12,  # Frame area pencarian
                       relief=tk.FLAT, bd=0)
-        sf.pack(fill=tk.X, padx=14, pady=(12, 0))              # Tempatkan dengan margin
+        # Tempatkan dengan margin
+        sf.pack(fill=tk.X, padx=14, pady=(12, 0))
 
-        tk.Label(sf, text="Cari Kata:", font=("Segoe UI", 10, "bold"), # Label "Cari Kata:"
-                 bg=C_PANEL, fg=C_TEXT).grid(row=0, column=0, sticky="w", padx=(0,10))
+        tk.Label(sf, text="Cari Kata:", font=("Segoe UI", 10, "bold"),  # Label "Cari Kata:"
+                 bg=C_PANEL, fg=C_TEXT).grid(row=0, column=0, sticky="w", padx=(0, 10))
 
-        self.entry_var = tk.StringVar()                         # Variabel penampung teks input
-        self.entry_var.trace_add("write", self.on_typing)       # Pantau perubahan ketikan
+        # Variabel penampung teks input
+        self.entry_var = tk.StringVar()
+        # Pantau perubahan ketikan
+        self.entry_var.trace_add("write", self.on_typing)
 
         self.entry = tk.Entry(                                  # Kotak input pencarian
             sf, textvariable=self.entry_var, width=48,
             font=("Segoe UI", 10), bg=C_INPUT, fg=C_TEXT,
             relief=tk.SOLID, bd=1
         )
-        self.entry.grid(row=0, column=1, padx=(0, 8), sticky="we") # Tempatkan di kolom 1
-        self.entry.bind("<Return>", lambda e: self.search_word())   # Enter = jalankan pencarian
+        self.entry.grid(row=0, column=1, padx=(0, 8),
+                        sticky="we")  # Tempatkan di kolom 1
+        # Enter = jalankan pencarian
+        self.entry.bind("<Return>", lambda e: self.search_word())
 
         tk.Button(                                              # Tombol Cari berwarna biru
             sf, text="Cari", command=self.search_word,
@@ -148,20 +214,23 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
 
         # == BAGIAN AUTOCOMPLETE: Saran kata saat mengetik ==
         tk.Label(sf, text="Saran:", font=("Segoe UI", 8),      # Label kecil "Saran:"
-                 bg=C_PANEL, fg=C_MUTED).grid(row=1, column=0, sticky="nw", pady=(6,0))
+                 bg=C_PANEL, fg=C_MUTED).grid(row=1, column=0, sticky="nw", pady=(6, 0))
 
         self.autocomplete_list = tk.Listbox(                    # Listbox saran autocomplete
             sf, height=4, font=("Segoe UI", 10),
             bg=C_INPUT, fg=C_TEXT, selectbackground=C_ACCENT,
             selectforeground="white", relief=tk.SOLID, bd=1, activestyle="none"
         )
-        self.autocomplete_list.grid(row=1, column=1, sticky="we", pady=(6,0)) # Tempatkan di bawah input
-        self.autocomplete_list.bind("<<ListboxSelect>>", self.on_autocomplete_select) # Klik = pilih saran
+        # Tempatkan di bawah input
+        self.autocomplete_list.grid(row=1, column=1, sticky="we", pady=(6, 0))
+        self.autocomplete_list.bind(
+            "<<ListboxSelect>>", self.on_autocomplete_select)  # Klik = pilih saran
 
         sf.grid_columnconfigure(1, weight=1)  # Kolom input bisa melebar
 
         # == BAGIAN TOOLBAR: Tombol navigasi dan menu ==
-        toolbar = tk.Frame(self.root, bg=C_BG, pady=8)         # Frame toolbar tengah
+        # Frame toolbar tengah
+        toolbar = tk.Frame(self.root, bg=C_BG, pady=8)
         toolbar.pack(fill=tk.X, padx=14)
 
         def mkbtn(parent, text, cmd, bg=C_BTN):                # Helper pembuat tombol seragam
@@ -170,24 +239,33 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                              fg="white", relief=tk.FLAT, padx=9, pady=4, cursor="hand2")
 
         # -- Navigasi kiri: Back & Forward --
-        left = tk.Frame(toolbar, bg=C_BG)                      # Frame sisi kiri toolbar
+        # Frame sisi kiri toolbar
+        left = tk.Frame(toolbar, bg=C_BG)
         left.pack(side=tk.LEFT)
-        mkbtn(left, "< Back",    self.go_back).pack(side=tk.LEFT, padx=(0,4))   # Tombol kembali riwayat
-        mkbtn(left, "Forward >", self.go_forward).pack(side=tk.LEFT, padx=4)    # Tombol maju riwayat
+        mkbtn(left, "< Back",    self.go_back).pack(
+            side=tk.LEFT, padx=(0, 4))   # Tombol kembali riwayat
+        mkbtn(left, "Forward >", self.go_forward).pack(
+            side=tk.LEFT, padx=4)    # Tombol maju riwayat
 
         # -- Menu kanan: Favorit, Riwayat, Kuis --
-        right = tk.Frame(toolbar, bg=C_BG)                     # Frame sisi kanan toolbar
+        # Frame sisi kanan toolbar
+        right = tk.Frame(toolbar, bg=C_BG)
         right.pack(side=tk.RIGHT)
-        mkbtn(right, "Favorit",  self.add_favorite,  "#0f766e").pack(side=tk.LEFT, padx=4) # Tombol tambah favorit (hijau teal)
-        mkbtn(right, "Daftar",   self.show_favorites, "#0369a1").pack(side=tk.LEFT, padx=4) # Tombol lihat daftar favorit (biru)
-        mkbtn(right, "Riwayat",  self.show_history,   "#4338ca").pack(side=tk.LEFT, padx=4) # Tombol riwayat pencarian (indigo)
-        mkbtn(right, "Kuis",     self.quiz_mode,      "#b45309").pack(side=tk.LEFT, padx=(4,0)) # Tombol mode kuis (cokelat)
+        mkbtn(right, "Favorit",  self.add_favorite,  "#0f766e").pack(
+            side=tk.LEFT, padx=4)  # Tombol tambah favorit (hijau teal)
+        mkbtn(right, "Daftar",   self.show_favorites, "#0369a1").pack(
+            side=tk.LEFT, padx=4)  # Tombol lihat daftar favorit (biru)
+        mkbtn(right, "Riwayat",  self.show_history,   "#4338ca").pack(
+            side=tk.LEFT, padx=4)  # Tombol riwayat pencarian (indigo)
+        mkbtn(right, "Kuis",     self.quiz_mode,      "#b45309").pack(
+            side=tk.LEFT, padx=(4, 0))  # Tombol mode kuis (cokelat)
 
         # == BAGIAN HASIL: Kotak tampilan hasil pencarian ==
-        rf = tk.Frame(self.root, bg=C_PANEL, padx=14, pady=10) # Frame area hasil
+        rf = tk.Frame(self.root, bg=C_PANEL, padx=14,
+                      pady=10)  # Frame area hasil
         rf.pack(fill=tk.BOTH, expand=True, padx=14, pady=(6, 14))
 
-        tk.Label(rf, text="Hasil Pencarian:", font=("Segoe UI", 10, "bold"), # Label judul area hasil
+        tk.Label(rf, text="Hasil Pencarian:", font=("Segoe UI", 10, "bold"),  # Label judul area hasil
                  bg=C_PANEL, fg=C_TEXT).pack(anchor="w", pady=(0, 6))
 
         self.result_text = tk.Text(                             # Kotak teks hasil (read-only)
@@ -195,13 +273,18 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
             state=tk.DISABLED, wrap=tk.WORD, padx=20, pady=16,
             relief=tk.FLAT, bd=0
         )
-        self.result_text.pack(fill=tk.BOTH, expand=True)       # Isi seluruh area yang tersedia
+        # Isi seluruh area yang tersedia
+        self.result_text.pack(fill=tk.BOTH, expand=True)
 
         # Konfigurasi gaya teks (Rich Text)
-        self.result_text.tag_configure("title", font=("Segoe UI", 24, "bold"), foreground="#1e3a5f", spacing3=12)
-        self.result_text.tag_configure("label", font=("Segoe UI", 11, "bold"), foreground="#64748b", spacing1=6)
-        self.result_text.tag_configure("value", font=("Segoe UI", 12), foreground="#1e293b")
-        self.result_text.tag_configure("info", font=("Segoe UI", 12, "italic"), foreground="#b45309")
+        self.result_text.tag_configure("title", font=(
+            "Segoe UI", 24, "bold"), foreground="#1e3a5f", spacing3=12)
+        self.result_text.tag_configure("label", font=(
+            "Segoe UI", 11, "bold"), foreground="#64748b", spacing1=6)
+        self.result_text.tag_configure("value", font=(
+            "Segoe UI", 12), foreground="#1e293b")
+        self.result_text.tag_configure("info", font=(
+            "Segoe UI", 12, "italic"), foreground="#b45309")
 
     def on_typing(self, *args):
         prefix = self.entry_var.get().lower()
@@ -227,23 +310,25 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
     def display_rich_result(self, word, arti_raw):
         self.result_text.config(state=tk.NORMAL)
         self.result_text.delete(1.0, tk.END)
-        
+
         # Cetak Judul Utama (Kata)
         self.result_text.insert(tk.END, f"{word.capitalize()}\n", "title")
-        
+
         # Cetak rincian arti
         lines = arti_raw.strip().split("\n")
         for line in lines:
             line = line.strip()
-            if line.startswith("- "): line = line[2:] # Hilangkan strip
-            
+            if line.startswith("- "):
+                line = line[2:]  # Hilangkan strip
+
             if ":" in line:
                 label, val = line.split(":", 1)
-                self.result_text.insert(tk.END, f"  {label.strip().upper()}   ", "label")
+                self.result_text.insert(
+                    tk.END, f"  {label.strip().upper()}   ", "label")
                 self.result_text.insert(tk.END, f"{val.strip()}\n", "value")
             else:
                 self.result_text.insert(tk.END, f"{line}\n", "value")
-                
+
         self.result_text.config(state=tk.DISABLED)
 
     def search_word(self, word_to_search=None):
@@ -260,7 +345,8 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
             self.display_result(f"Mencari saran untuk '{word}'...", "info")
             self.root.update()
 
-            suggestions = get_fuzzy_suggestions(word, self.hash_table.keys(), max_suggestions=4)
+            suggestions = get_fuzzy_suggestions(
+                word, self.hash_table.keys(), max_suggestions=4)
             if suggestions:
                 suggestion_lines = "\n".join(
                     f"- {candidate} (jarak {dist})" for candidate, dist in suggestions)
@@ -270,7 +356,8 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                     f"Kata '{word}' tidak ditemukan.\n\nMungkin maksud Anda:\n{suggestion_lines}\n\nArti '{best_word}': {arti}", "info"
                 )
             else:
-                self.display_result(f"Kata '{word}' sama sekali tidak ditemukan.", "info")
+                self.display_result(
+                    f"Kata '{word}' sama sekali tidak ditemukan.", "info")
 
     def go_back(self):
         prev_word = self.history.go_back()
@@ -288,12 +375,16 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         word = self.entry_var.get().lower().strip()
         if self.hash_table.contains(word):
             if word in self.favorites:
-                messagebox.showinfo("Info", f"'{word}' sudah ada di Daftar Favorit.")
+                messagebox.showinfo(
+                    "Info", f"'{word}' sudah ada di Daftar Favorit.")
             else:
                 self.favorites.add(word)
-                messagebox.showinfo("Berhasil", f"'{word}' ditambahkan ke Daftar Favorit!")
+                self.save_favorites()
+                messagebox.showinfo(
+                    "Berhasil", f"'{word}' ditambahkan ke Daftar Favorit!")
         else:
-            messagebox.showwarning("Gagal", "Cari kata yang valid terlebih dahulu.")
+            messagebox.showwarning(
+                "Gagal", "Cari kata yang valid terlebih dahulu.")
 
     def show_favorites(self):
         win = tk.Toplevel(self.root)
@@ -301,7 +392,8 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         win.geometry("500x380")
         win.resizable(False, False)
 
-        tk.Label(win, text="Daftar Kata Favorit", font=("Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
+        tk.Label(win, text="Daftar Kata Favorit", font=(
+            "Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
 
         columns = ("no", "kata", "arti")
         tree = ttk.Treeview(win, columns=columns, show="headings", height=10)
@@ -325,10 +417,12 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         def hapus():
             sel = tree.selection()
             if not sel:
-                messagebox.showwarning("Peringatan", "Pilih kata yang ingin dihapus.", parent=win)
+                messagebox.showwarning(
+                    "Peringatan", "Pilih kata yang ingin dihapus.", parent=win)
                 return
             kata = str(tree.item(sel[0])["values"][1])
             self.favorites.discard(kata)
+            self.save_favorites()
             tree.delete(sel[0])
 
         btn_f = tk.Frame(win)
@@ -344,7 +438,8 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         win.geometry("500x380")
         win.resizable(False, False)
 
-        tk.Label(win, text="Riwayat Pencarian", font=("Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
+        tk.Label(win, text="Riwayat Pencarian", font=(
+            "Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
 
         columns = ("no", "kata", "arti")
         tree = ttk.Treeview(win, columns=columns, show="headings", height=10)
@@ -383,7 +478,8 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
 
     def quiz_mode(self):
         if not hasattr(self, 'kamus_data') or not self.kamus_data:
-            messagebox.showwarning("Data Kosong", "Data kamus tidak ditemukan atau kosong.")
+            messagebox.showwarning(
+                "Data Kosong", "Data kamus tidak ditemukan atau kosong.")
             return
 
         sel = tk.Toplevel(self.root)
@@ -392,8 +488,10 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         sel.resizable(False, False)
         sel.grab_set()
 
-        tk.Label(sel, text="Pilih Mode Kuis", font=("Segoe UI", 13, "bold"), pady=10).pack(fill=tk.X)
-        tk.Label(sel, text="Pilih arah terjemahan untuk soal kuis:", font=("Segoe UI", 10)).pack(pady=(12, 6))
+        tk.Label(sel, text="Pilih Mode Kuis", font=(
+            "Segoe UI", 13, "bold"), pady=10).pack(fill=tk.X)
+        tk.Label(sel, text="Pilih arah terjemahan untuk soal kuis:",
+                 font=("Segoe UI", 10)).pack(pady=(12, 6))
 
         MODE_LIST = [
             ("Indonesia  →  Sunda",    "indonesia", "sunda"),
@@ -425,11 +523,13 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
             if item.get(field_soal, "").strip() and item.get(field_jawab, "").strip()
         ]
         if not entri_valid:
-            messagebox.showwarning("Kuis Kosong", "Tidak cukup kosa kata untuk mode ini.")
+            messagebox.showwarning(
+                "Kuis Kosong", "Tidak cukup kosa kata untuk mode ini.")
             return
 
         MAX_SOAL = 10
-        LABEL = {"indonesia": "Indonesia", "inggris": "Inggris", "sunda": "Sunda"}
+        LABEL = {"indonesia": "Indonesia",
+                 "inggris": "Inggris", "sunda": "Sunda"}
 
         win = tk.Toplevel(self.root)
         win.title(f"Kuis {LABEL[field_soal]} → {LABEL[field_jawab]}")
@@ -443,23 +543,28 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                  font=("Segoe UI", 13, "bold"), pady=10).pack(fill=tk.X)
 
         info_var = tk.StringVar(value=f"Soal 1 / {MAX_SOAL}  |  Skor: 0")
-        tk.Label(win, textvariable=info_var, font=("Segoe UI", 10)).pack(pady=(8, 0))
+        tk.Label(win, textvariable=info_var, font=(
+            "Segoe UI", 10)).pack(pady=(8, 0))
 
         soal_var = tk.StringVar()
         tk.Label(win, textvariable=soal_var, font=("Segoe UI", 13, "bold"),
                  wraplength=430, pady=16, padx=16).pack(fill=tk.X, padx=14, pady=10)
 
-        tk.Label(win, text=f"Jawab dalam bahasa {LABEL[field_jawab]}:", font=("Segoe UI", 9, "italic")).pack()
+        tk.Label(win, text=f"Jawab dalam bahasa {LABEL[field_jawab]}:", font=(
+            "Segoe UI", 9, "italic")).pack()
 
         jawaban_var = tk.StringVar()
-        entry_jawab = tk.Entry(win, textvariable=jawaban_var, font=("Segoe UI", 12), justify="center")
+        entry_jawab = tk.Entry(win, textvariable=jawaban_var, font=(
+            "Segoe UI", 12), justify="center")
         entry_jawab.pack(fill=tk.X, padx=14, pady=(4, 2))
 
         hint_var = tk.StringVar(value="Tekan Enter untuk menjawab")
-        tk.Label(win, textvariable=hint_var, font=("Segoe UI", 8, "italic")).pack()
+        tk.Label(win, textvariable=hint_var, font=(
+            "Segoe UI", 8, "italic")).pack()
 
         feedback_var = tk.StringVar()
-        lbl_feedback = tk.Label(win, textvariable=feedback_var, font=("Segoe UI", 10, "bold"))
+        lbl_feedback = tk.Label(
+            win, textvariable=feedback_var, font=("Segoe UI", 10, "bold"))
         lbl_feedback.pack(pady=4)
 
         kunci_var = tk.StringVar()
@@ -467,12 +572,16 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                  wraplength=440, justify="left").pack(padx=14)
 
         def tampil_hasil():
-            for w in win.winfo_children(): w.destroy()
+            for w in win.winfo_children():
+                w.destroy()
             b, t = state["benar"], state["total"]
             persen = int(b / t * 100) if t > 0 else 0
-            if persen >= 80:   pesan = "Luar Biasa!"
-            elif persen >= 50: pesan = "Cukup Bagus!"
-            else:              pesan = "Perlu Belajar Lagi!"
+            if persen >= 80:
+                pesan = "Luar Biasa!"
+            elif persen >= 50:
+                pesan = "Cukup Bagus!"
+            else:
+                pesan = "Perlu Belajar Lagi!"
 
             import datetime
             mode_label = f"{LABEL[field_soal]} → {LABEL[field_jawab]}"
@@ -484,10 +593,14 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                 "waktu":  datetime.datetime.now().strftime("%H:%M:%S")
             })
 
-            tk.Label(win, text="Hasil Kuis", font=("Segoe UI", 14, "bold"), pady=10).pack(fill=tk.X)
-            tk.Label(win, text=pesan, font=("Segoe UI", 18, "bold")).pack(pady=18)
-            tk.Label(win, text=f"{b} / {t} Benar", font=("Segoe UI", 28, "bold")).pack()
-            tk.Label(win, text=f"Persentase: {persen}%", font=("Segoe UI", 11)).pack(pady=(4, 20))
+            tk.Label(win, text="Hasil Kuis", font=(
+                "Segoe UI", 14, "bold"), pady=10).pack(fill=tk.X)
+            tk.Label(win, text=pesan, font=(
+                "Segoe UI", 18, "bold")).pack(pady=18)
+            tk.Label(win, text=f"{b} / {t} Benar",
+                     font=("Segoe UI", 28, "bold")).pack()
+            tk.Label(win, text=f"Persentase: {persen}%", font=(
+                "Segoe UI", 11)).pack(pady=(4, 20))
             tk.Button(win, text="Tutup", command=win.destroy, font=("Segoe UI", 10, "bold"),
                       padx=16, pady=6, cursor="hand2").pack()
 
@@ -500,8 +613,10 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
             state["kata"] = item
             nomor = state["total"] + 1
             kata_soal = item.get(field_soal, "")
-            soal_var.set(f"Apa kata {LABEL[field_jawab]} dari:\n\"{kata_soal}\"?")
-            info_var.set(f"Soal {nomor} / {MAX_SOAL}  |  Skor: {state['benar']}")
+            soal_var.set(
+                f"Apa kata {LABEL[field_jawab]} dari:\n\"{kata_soal}\"?")
+            info_var.set(
+                f"Soal {nomor} / {MAX_SOAL}  |  Skor: {state['benar']}")
             jawaban_var.set("")
             feedback_var.set("")
             kunci_var.set("")
@@ -528,12 +643,14 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                 jawaban_utama = item.get(field_jawab, "")
                 sinonim_str = ", ".join(item.get("sinonim", []))
                 kunci = f"→ {LABEL[field_jawab]}: {jawaban_utama}"
-                if sinonim_str: kunci += f"\n→ Sinonim: {sinonim_str}"
+                if sinonim_str:
+                    kunci += f"\n→ Sinonim: {sinonim_str}"
                 kunci_var.set(kunci)
 
             state["sudah_jawab"] = True
             entry_jawab.config(state=tk.DISABLED)
-            info_var.set(f"Soal {state['total']} / {MAX_SOAL}  |  Skor: {state['benar']}")
+            info_var.set(
+                f"Soal {state['total']} / {MAX_SOAL}  |  Skor: {state['benar']}")
             if state["total"] >= MAX_SOAL:
                 hint_var.set("Tekan Enter untuk melihat hasil akhir")
             else:
@@ -564,7 +681,8 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         win.geometry("560x360")
         win.resizable(False, False)
 
-        tk.Label(win, text="Riwayat Kuis", font=("Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
+        tk.Label(win, text="Riwayat Kuis", font=(
+            "Segoe UI", 12, "bold"), pady=8).pack(fill=tk.X)
 
         cols = ("no", "waktu", "mode", "skor", "persen")
         tree = ttk.Treeview(win, columns=cols, show="headings", height=9)
@@ -581,7 +699,8 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         tree.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
         if not self.quiz_history:
-            tree.insert("", tk.END, values=("-", "-", "(Belum ada kuis)", "-", "-"))
+            tree.insert("", tk.END, values=(
+                "-", "-", "(Belum ada kuis)", "-", "-"))
         else:
             for i, rec in enumerate(self.quiz_history, 1):
                 p = rec["persen"]
@@ -598,7 +717,8 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
             self.quiz_history.clear()
             for row in tree.get_children():
                 tree.delete(row)
-            tree.insert("", tk.END, values=("-", "-", "(Belum ada kuis)", "-", "-"))
+            tree.insert("", tk.END, values=(
+                "-", "-", "(Belum ada kuis)", "-", "-"))
 
         btn_f = tk.Frame(win)
         btn_f.pack(pady=(0, 10))
