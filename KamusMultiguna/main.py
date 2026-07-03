@@ -27,8 +27,36 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         self.favorites    = set()            # Set: daftar kata favorit (tidak duplikat)
         self.quiz_history = []               # List: menyimpan hasil sesi kuis
 
+        self.root.configure(bg="#f0f2f5")      # Terapkan warna latar belakang utama
+        self.root.geometry("760x620")          # Ukuran jendela: lebar x tinggi (pixel)
+        self.root.resizable(False, False)      # Larang pengubahan ukuran jendela
+
         self.load_data()        # Muat data kamus dari file JSON ke struktur data
-        self.create_widgets()   # Bangun tampilan antarmuka grafis
+        self.show_welcome_screen() # Tampilkan halaman selamat datang terlebih dahulu
+
+    def show_welcome_screen(self):
+        # Frame penutup seluruh jendela untuk halaman awal
+        self.welcome_frame = tk.Frame(self.root, bg="#1e3a5f")
+        self.welcome_frame.pack(fill=tk.BOTH, expand=True)
+        
+        tk.Label(self.welcome_frame, bg="#1e3a5f").pack(pady=70) # Jarak atas
+        
+        # Judul Besar
+        tk.Label(self.welcome_frame, text="Kamus Multi Guna", font=("Segoe UI", 32, "bold"), fg="white", bg="#1e3a5f").pack(pady=(0, 10))
+        tk.Label(self.welcome_frame, text="Indonesia · Inggris · Sunda", font=("Segoe UI", 14), fg="#93c5fd", bg="#1e3a5f").pack(pady=(0, 40))
+        
+        # Deskripsi
+        desc = "Aplikasi kamus pintar terintegrasi algoritma cerdas\n(Autocomplete, Typo Correction, dan Mode Kuis)."
+        tk.Label(self.welcome_frame, text=desc, font=("Segoe UI", 12), fg="#cbd5e1", bg="#1e3a5f", justify="center").pack(pady=(0, 50))
+        
+        # Tombol Mulai
+        btn_mulai = tk.Button(self.welcome_frame, text="Mulai Belajar", font=("Segoe UI", 12, "bold"), bg="#2563eb", fg="white", 
+                  padx=30, pady=10, relief=tk.FLAT, cursor="hand2", command=self.start_app)
+        btn_mulai.pack()
+
+    def start_app(self):
+        self.welcome_frame.destroy() # Hapus halaman awal
+        self.create_widgets()        # Muat antarmuka utama kamus
 
     # ─────────────────────────────────────────────
     # MODUL 4B: PEMUATAN DATA KAMUS DARI JSON
@@ -80,11 +108,6 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         C_BTN    = "#334155"   # Tombol standar abu gelap
         C_INPUT  = "#ffffff"   # Latar kotak input putih
         C_RESULT = "#f8fafc"   # Latar area hasil sangat terang
-
-        # == Ukuran & konfigurasi jendela utama ==
-        self.root.configure(bg=C_BG)          # Terapkan warna latar belakang utama
-        self.root.geometry("760x620")          # Ukuran jendela: lebar x tinggi (pixel)
-        self.root.resizable(False, False)      # Larang pengubahan ukuran jendela
 
         # == BAGIAN HEADER: Judul aplikasi ==
         header = tk.Frame(self.root, bg=C_HEADER, pady=14) # Frame header biru tua
@@ -168,11 +191,17 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                  bg=C_PANEL, fg=C_TEXT).pack(anchor="w", pady=(0, 6))
 
         self.result_text = tk.Text(                             # Kotak teks hasil (read-only)
-            rf, font=("Consolas", 10), bg=C_RESULT, fg=C_TEXT,
-            state=tk.DISABLED, wrap=tk.WORD, padx=10, pady=10,
-            relief=tk.SOLID, bd=1
+            rf, font=("Segoe UI", 11), bg=C_RESULT, fg=C_TEXT,
+            state=tk.DISABLED, wrap=tk.WORD, padx=20, pady=16,
+            relief=tk.FLAT, bd=0
         )
         self.result_text.pack(fill=tk.BOTH, expand=True)       # Isi seluruh area yang tersedia
+
+        # Konfigurasi gaya teks (Rich Text)
+        self.result_text.tag_configure("title", font=("Segoe UI", 24, "bold"), foreground="#1e3a5f", spacing3=12)
+        self.result_text.tag_configure("label", font=("Segoe UI", 11, "bold"), foreground="#64748b", spacing1=6)
+        self.result_text.tag_configure("value", font=("Segoe UI", 12), foreground="#1e293b")
+        self.result_text.tag_configure("info", font=("Segoe UI", 12, "italic"), foreground="#b45309")
 
     def on_typing(self, *args):
         prefix = self.entry_var.get().lower()
@@ -189,10 +218,32 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
             self.entry_var.set(word)
             self.search_word()
 
-    def display_result(self, text):
+    def display_result(self, text, tag="info"):
         self.result_text.config(state=tk.NORMAL)
         self.result_text.delete(1.0, tk.END)
-        self.result_text.insert(tk.END, text)
+        self.result_text.insert(tk.END, text, tag)
+        self.result_text.config(state=tk.DISABLED)
+
+    def display_rich_result(self, word, arti_raw):
+        self.result_text.config(state=tk.NORMAL)
+        self.result_text.delete(1.0, tk.END)
+        
+        # Cetak Judul Utama (Kata)
+        self.result_text.insert(tk.END, f"{word.capitalize()}\n", "title")
+        
+        # Cetak rincian arti
+        lines = arti_raw.strip().split("\n")
+        for line in lines:
+            line = line.strip()
+            if line.startswith("- "): line = line[2:] # Hilangkan strip
+            
+            if ":" in line:
+                label, val = line.split(":", 1)
+                self.result_text.insert(tk.END, f"  {label.strip().upper()}   ", "label")
+                self.result_text.insert(tk.END, f"{val.strip()}\n", "value")
+            else:
+                self.result_text.insert(tk.END, f"{line}\n", "value")
+                
         self.result_text.config(state=tk.DISABLED)
 
     def search_word(self, word_to_search=None):
@@ -202,11 +253,11 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
 
         if self.hash_table.contains(word):
             arti = self.hash_table.get(word)
-            self.display_result(f"Kata: {word}\nArti: {arti}")
+            self.display_rich_result(word, arti)
             if not word_to_search:
                 self.history.add(word)
         else:
-            self.display_result(f"Kata '{word}' tidak ditemukan.\nMencari saran...")
+            self.display_result(f"Mencari saran untuk '{word}'...", "info")
             self.root.update()
 
             suggestions = get_fuzzy_suggestions(word, self.hash_table.keys(), max_suggestions=4)
@@ -216,11 +267,10 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
                 best_word, best_dist = suggestions[0]
                 arti = self.hash_table.get(best_word)
                 self.display_result(
-                    f"Kata '{word}' tidak ditemukan.\n\nMungkin maksud Anda:\n{suggestion_lines}\n\nArti '{best_word}': {arti}"
+                    f"Kata '{word}' tidak ditemukan.\n\nMungkin maksud Anda:\n{suggestion_lines}\n\nArti '{best_word}': {arti}", "info"
                 )
             else:
-                self.display_result(
-                    f"Kata '{word}' tidak ditemukan dan tidak ada saran kata yang cocok.")
+                self.display_result(f"Kata '{word}' sama sekali tidak ditemukan.", "info")
 
     def go_back(self):
         prev_word = self.history.go_back()
@@ -338,7 +388,7 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
 
         sel = tk.Toplevel(self.root)
         sel.title("Pilih Mode Kuis")
-        sel.geometry("380x300")
+        sel.geometry("380x360")
         sel.resizable(False, False)
         sel.grab_set()
 

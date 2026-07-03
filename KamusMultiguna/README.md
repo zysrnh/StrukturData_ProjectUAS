@@ -1,43 +1,48 @@
 # Alur Sistem Kamus Multi Guna (Terintegrasi Struktur Data)
 
 ## 📁 Arsitektur Proyek
-Aplikasi ini dikembangkan dengan arsitektur modular yang memisahkan GUI dengan logika algoritma:
-- **`Main.py`** : Mengelola antarmuka grafis (GUI) Tkinter dan interaksi pengguna.
-- **`dataset/kamus.json`** : Basis data utama berformat JSON (Indonesia, Inggris, Sunda, Sinonim, Antonim).
-- **`modules/`** : Kumpulan kelas struktur data & algoritma.
-  - `Trie.py` *(Trie Tree)*
-  - `HashTable.py` *(Custom Hash Table dengan Chaining)*
-  - `DoublyLinkedList.py` *(Doubly Linked List)*
-  - `FuzzySearch.py` *(Algoritma Levenshtein Distance)*
+Aplikasi ini dikembangkan dengan arsitektur modular yang memisahkan antarmuka pengguna (GUI) dengan logika algoritma. Struktur direktori telah disesuaikan agar lebih profesional:
+- **`main.py`** : Mengelola antarmuka grafis (GUI) Tkinter dan interaksi pengguna.
+- **`dataset/kamus.json`** : Basis data utama berformat JSON yang berisi kosa kata (Indonesia, Inggris, Sunda, Sinonim, Antonim).
+- **`modules/`** : Kumpulan kelas modul struktur data & algoritma.
+  - `Trie.py` *(Trie Tree untuk Autocomplete)*
+  - `HashTable.py` *(Custom Hash Table dengan Chaining untuk pencarian O(1))*
+  - `DoublyLinkedList.py` *(Doubly Linked List untuk riwayat navigasi)*
+  - `FuzzySearch.py` *(Algoritma Levenshtein Distance untuk koreksi salah ketik/typo)*
+
+---
+
+## 🎨 Antarmuka Pengguna (UI/UX)
+- Aplikasi menerapkan palet warna "Kalem" (*muted steel-blue*) yang profesional dan modern (`#f0f2f5`, `#1e3a5f`, `#2563eb`).
+- Menggunakan tipografi *Rich Text* pada hasil pencarian agar informasi (kata, arti, sinonim, antonim) lebih terstruktur dan mudah dibaca.
+- Antarmuka mengandalkan elemen UI berbasis teks (*text-based UI elements*) yang bersih (tanpa *icon* berlebihan) agar terlihat elegan dan rapi.
 
 ---
 
 ## 🔄 Alur Kerja Aplikasi
 
 **1. Tahap Inisialisasi (Startup)**
-- Aplikasi dijalankan melalui `Main.py`.
-- Sistem membaca dan memuat *dataset* dari `dataset/kamus.json`.
-- Seluruh kosa kata dipetakan ke dalam struktur data **Hash Table** untuk akses berkecepatan $O(1)$, dan dimasukkan ke dalam struktur **Trie** untuk keperluan *autocomplete*.
+- Aplikasi dijalankan melalui `main.py`.
+- Sistem memuat basis data dari `dataset/kamus.json`. Seluruh kosa kata dipetakan ke dalam struktur **Hash Table** dan dimasukkan ke dalam struktur **Trie**.
+- Layar akan menampilkan **Halaman Selamat Datang (Welcome Screen)**. Pengguna dapat mengeklik "Mulai Belajar" untuk masuk ke antarmuka utama.
 
-**2. Fitur Pencarian & Autocomplete**
-- Pengguna mengetik kata pada kolom pencarian.
-- Secara *real-time*, struktur data **Trie** akan memunculkan daftar saran kata (maksimal 6) yang berawalan sesuai ketikan.
+**2. Fitur Pencarian & Autocomplete (Trie)**
+- Saat pengguna mengetik kata pada kolom pencarian, struktur **Trie** secara *real-time* akan memunculkan daftar saran kata (maksimal 6) yang berawalan sesuai huruf yang diketik.
 
-**3. Proses Eksekusi Pencarian (Search)**
+**3. Proses Eksekusi Pencarian (Hash Table & Fuzzy Search)**
 - Saat tombol **Cari** (atau *Enter*) ditekan:
-  - **Ditemukan:** Sistem mengambil terjemahan, sinonim, dan antonim secara instan $O(1)$ dari **Hash Table**.
-  - **Tidak Ditemukan:** Algoritma **Fuzzy Search (Levenshtein Distance)** akan dipanggil untuk mengalkulasi jarak *typo*. Aplikasi lalu menampilkan rekomendasi kata terdekat beserta artinya.
-- Kata yang baru dicari akan ditambahkan secara dinamis ke dalam **Doubly Linked List** sebagai Riwayat.
+  - **Ditemukan:** Sistem memanggil **Hash Table** untuk mengambil terjemahan, sinonim, dan antonim secara instan ($O(1)$).
+  - **Tidak Ditemukan:** Algoritma **Fuzzy Search (Levenshtein Distance)** akan dipanggil untuk mengalkulasi jarak *typo*. Sistem akan memberikan rekomendasi maksimal 4 kata terdekat beserta artinya.
+- Kata yang sukses dicari akan ditambahkan ke ujung **Doubly Linked List** (Riwayat).
 
-**4. Navigasi & Manajemen Data**
-- **Navigasi Riwayat:** Pengguna dapat menekan tombol `< Back` atau `Forward >` untuk berpindah ke hasil pencarian sebelumnya/selanjutnya berkat penunjuk arah (*pointer*) ganda di dalam **Doubly Linked List**.
-- **Daftar Favorit:** Pengguna dapat mengeklik "⭐ Favorit" untuk menyimpan kosa kata ke dalam struktur set memori.
-- **Tabel Rekap:** Menu "📋 Daftar" (Favorit) dan "🕓 Riwayat" (Pencarian) menampilkan rangkuman kata dalam antarmuka tabular.
+**4. Navigasi & Manajemen Data (Doubly Linked List & Set)**
+- **Navigasi Riwayat:** Menggunakan pointer di **Doubly Linked List**, pengguna dapat menekan tombol `< Back` atau `Forward >` untuk mundur/maju menelusuri riwayat kata yang pernah dicari.
+- **Daftar Favorit:** Pengguna dapat menyimpan kata penting dengan mengeklik tombol "Favorit". Data akan disimpan dalam struktur `set()` agar terhindar dari duplikasi.
+- **Tabel Rekap:** Melalui menu "Daftar" dan "Riwayat", pengguna bisa melihat rangkuman kata favorit atau riwayat pencarian dalam bentuk antarmuka tabel (`Treeview`).
 
-**5. Mode Kuis Interaktif (Quiz)**
-- Pengguna mengeklik menu "🎮 Kuis" untuk menguji wawasan kosa kata secara acak.
-- Terdapat pilihan alur soal (Misal: Indonesia → Inggris).
-- Skor akan disimpan secara berkelanjutan dan dapat dilihat melalui menu khusus "Riwayat Kuis".
+**5. Mode Kuis Interaktif**
+- Menu **Kuis** digunakan untuk menguji kemampuan kosa kata secara acak (Misal: Indonesia → Inggris, Sunda → Indonesia, dsb.).
+- Sesi kuis mencatat statistik jawaban benar/salah. Hasil akhir berupa skor, persentase, dan predikat keberhasilan akan disimpan ke dalam **Riwayat Kuis**.
 
-**6. Keluar / Penutupan (End)**
-- Saat jendela aplikasi ditutup, sesi pada memori akan dihapus dan program berakhir.
+**6. Keluar / Penutupan**
+- Saat jendela ditutup, memori sesi (riwayat, favorit sementara) akan dilepas, dan program berakhir.
