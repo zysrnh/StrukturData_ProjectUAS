@@ -551,7 +551,7 @@ class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
         btn_f.pack(pady=8)
         tk.Button(btn_f, text="Jawab", command=periksa, font=("Segoe UI", 10, "bold"),
                   padx=12, pady=5, cursor="hand2").pack(side=tk.LEFT, padx=4)
-        tk.Button(btn_f, text="Lewati", command=soal_baru, font=("Segoe UI", 10, "bold"),
+        tk.Button(btn_f, text="Selanjutnya", command=soal_baru, font=("Segoe UI", 10, "bold"),
                   padx=12, pady=5, cursor="hand2").pack(side=tk.LEFT, padx=4)
         tk.Button(btn_f, text="Keluar", command=win.destroy, font=("Segoe UI", 10, "bold"),
                   padx=12, pady=5, cursor="hand2").pack(side=tk.LEFT, padx=4)
