@@ -608,6 +608,8 @@ class KamusApp:
             entry_jawab.focus()
 
         def periksa():
+            if state["sudah_jawab"]:
+                return
             jawaban = jawaban_var.get().strip().lower()
             if not jawaban:
                 return
