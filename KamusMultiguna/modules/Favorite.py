@@ -1,13 +1,21 @@
+# ============================================================
+# MODUL 6: PENGUJIAN FITUR FAVORIT
+# Digunakan untuk menguji fungsi simpan dan muat data kata favorit
+# ============================================================
+
 import json
 import os
 import tempfile
 import unittest
+import sys
 
+# Menambahkan path agar bisa mengimpor KamusApp dari main.py
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from main import KamusApp
 
 
-class FavoritesPersistenceTests(unittest.TestCase):
-    def test_save_and_load_favorites(self):
+class PengujianFavorit(unittest.TestCase):
+    def test_simpan_dan_muat_favorit(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             file_path = os.path.join(tmpdir, "favorites.json")
 
