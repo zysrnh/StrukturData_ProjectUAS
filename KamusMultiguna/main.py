@@ -16,87 +16,70 @@ from modules.HashTable import HashTable
 # ============================================================
 
 
-class KamusApp:  # Kelas utama yang menyatukan semua modul aplikasi
-    def __init__(self, root):  # Konstruktor: dipanggil saat aplikasi pertama dijalankan
-        self.root = root                     # Simpan referensi jendela utama Tkinter
-        # Judul yang tampil di title bar jendela
+class KamusApp:
+    def __init__(self, root):
+        self.root = root
         self.root.title("Kamus Multi Guna")
 
-        # Hash Table: penyimpanan utama data kamus O(1)
         self.hash_table = HashTable()
-        self.trie = Trie()           # Trie: struktur untuk autocomplete
-        self.history = DoublyLinkedList()  # DLL: navigasi riwayat pencarian
-        self.favorites = set()            # Set: daftar kata favorit (tidak duplikat)
-        self.quiz_history = []               # List: menyimpan hasil sesi kuis
+        self.trie = Trie()
+        self.history = DoublyLinkedList()
+        self.favorites = set()
+        self.quiz_history = []
 
-        # Terapkan warna latar belakang utama
         self.root.configure(bg="#f0f2f5")
-        # Ukuran jendela: lebar x tinggi (pixel)
         self.root.geometry("760x620")
-        # Larang pengubahan ukuran jendela
         self.root.resizable(False, False)
 
         script_dir = os.path.dirname(os.path.abspath(__file__))
         self.favorite_file_path = os.path.join(
             script_dir, "dataset", "favorites.json")
-        self.load_favorites()                 # Muat daftar favorit dari file JSON
-        self.load_data()                      # Muat data kamus dari file JSON ke struktur data
+        self.load_favorites()
+        self.load_data()
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
-        # Tampilkan halaman selamat datang terlebih dahulu
         self.show_welcome_screen()
 
     def show_welcome_screen(self):
-        # Frame penutup seluruh jendela untuk halaman awal
         self.welcome_frame = tk.Frame(self.root, bg="#1e3a5f")
         self.welcome_frame.pack(fill=tk.BOTH, expand=True)
 
-        tk.Label(self.welcome_frame, bg="#1e3a5f").pack(pady=70)  # Jarak atas
+        tk.Label(self.welcome_frame, bg="#1e3a5f").pack(pady=70)
 
-        # Judul Besar
         tk.Label(self.welcome_frame, text="Kamus Multi Guna", font=(
             "Segoe UI", 32, "bold"), fg="white", bg="#1e3a5f").pack(pady=(0, 10))
         tk.Label(self.welcome_frame, text="Indonesia · Inggris · Sunda", font=(
             "Segoe UI", 14), fg="#93c5fd", bg="#1e3a5f").pack(pady=(0, 40))
 
-        # Deskripsi
         desc = "Aplikasi kamus pintar terintegrasi algoritma cerdas\n(Autocomplete, Typo Correction, dan Mode Kuis)."
         tk.Label(self.welcome_frame, text=desc, font=("Segoe UI", 12),
                  fg="#cbd5e1", bg="#1e3a5f", justify="center").pack(pady=(0, 50))
 
-        # Tombol Mulai
         btn_mulai = tk.Button(self.welcome_frame, text="Mulai Belajar", font=("Segoe UI", 12, "bold"), bg="#2563eb", fg="white",
                               padx=30, pady=10, relief=tk.FLAT, cursor="hand2", command=self.start_app)
         btn_mulai.pack()
 
     def start_app(self):
-        self.welcome_frame.destroy()  # Hapus halaman awal
-        self.create_widgets()        # Muat antarmuka utama kamus
+        self.welcome_frame.destroy()
+        self.create_widgets()
 
     # ─────────────────────────────────────────────
     # MODUL 4B: PEMUATAN DATA KAMUS DARI JSON
     # Membaca file kamus.json dan mengisi Hash Table & Trie
     # ─────────────────────────────────────────────
-    def load_data(self):  # Fungsi memuat dan memparsing data kamus dari file JSON
-        script_dir = os.path.dirname(os.path.abspath(
-            __file__))  # Dapatkan folder lokasi script
-        # Rangkai path file kamus
+    def load_data(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
         path_kamus = os.path.join(script_dir, "dataset", "kamus.json")
-        self.kamus_data = []   # Inisialisasi list data mentah untuk keperluan mode kuis
+        self.kamus_data = []
 
-        if os.path.exists(path_kamus):  # Cek apakah file kamus.json ada
-            with open(path_kamus, 'r', encoding='utf-8') as f:  # Buka file dengan encoding UTF-8
-                data = json.load(f)          # Parse JSON menjadi list Python
-                self.kamus_data = data       # Simpan data mentah untuk kuis
-                for item in data:            # Iterasi setiap entri kata
-                    # Ambil kata dalam bahasa Indonesia
+        if os.path.exists(path_kamus):
+            with open(path_kamus, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                self.kamus_data = data
+                for item in data:
                     indonesia = item.get("indonesia", "")
-                    # Ambil kata dalam bahasa Inggris
-                    inggris = item.get("inggris",   "")
-                    # Ambil kata dalam bahasa Sunda
-                    sunda = item.get("sunda",     "")
-                    # Gabung daftar sinonim
+                    inggris = item.get("inggris", "")
+                    sunda = item.get("sunda", "")
                     sinonim = ", ".join(item.get("sinonim", []))
-                    # Gabung daftar antonim
                     antonim = ", ".join(item.get("antonim", []))
 
                     arti_teks = f"\n- Indonesia: {indonesia}\n- Inggris: {inggris}\n- Sunda: {sunda}"
