@@ -404,6 +404,8 @@ class KamusApp:
                     "Peringatan", "Pilih kata yang ingin dihapus.", parent=win)
                 return
             kata = str(tree.item(sel[0])["values"][1])
+            if kata == "(Belum ada favorit)":
+                return
             self.favorites.discard(kata)
             self.save_favorites()
             tree.delete(sel[0])
