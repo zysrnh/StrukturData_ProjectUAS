@@ -17,12 +17,14 @@ class HashTable:
         self.table = [None] * self.capacity
 
     def _hash(self, key):
+        # Rumus mengubah teks kata menjadi angka (sebagai index laci penyimpanan)
         hash_val = 0
         for char in key:
             hash_val = (hash_val * 31 + ord(char)) % self.capacity
         return hash_val
 
     def set(self, key, value):
+        # Menyimpan kata (key) dan artinya (value) ke dalam Hash Table
         index = self._hash(key)
 
         if self.table[index] is None:
@@ -43,6 +45,7 @@ class HashTable:
         self.size += 1
 
     def get(self, key, default=None):
+        # Mengambil dan menampilkan arti dari suatu kata yang dicari
         index = self._hash(key)
         current = self.table[index]
 
@@ -54,9 +57,11 @@ class HashTable:
         return default
 
     def contains(self, key):
+        # Mengecek apakah kata tersebut ada atau terdaftar di dalam kamus
         return self.get(key) is not None
 
     def keys(self):
+        # Mengumpulkan dan mengambil semua daftar kata yang ada di dalam kamus
         keys_list = []
         for i in range(self.capacity):
             current = self.table[i]

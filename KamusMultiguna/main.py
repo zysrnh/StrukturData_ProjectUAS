@@ -12,15 +12,15 @@ from modules.HashTable import HashTable
 
 # ============================================================
 # MODUL 4: KELAS APLIKASI GUI UTAMA (KamusApp)
-# Mengelola seluruh tampilan dan logika interaksi pengguna
+# Mengelola antarmuka pengguna (GUI) dan interaksi utama aplikasi
 # ============================================================
-
 
 class KamusApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Kamus Multi Guna")
 
+        # Inisialisasi struktur data (Pemanggilan dari modul)
         self.hash_table = HashTable()
         self.trie = Trie()
         self.history = DoublyLinkedList()
@@ -64,6 +64,7 @@ class KamusApp:
 
     # ─────────────────────────────────────────────
     # MODUL 4B: PEMUATAN DATA KAMUS DARI JSON
+    # Data Layer: Menyimpan & membaca data kamus dan favorit dari file JSON
     # Membaca file kamus.json dan mengisi Hash Table & Trie
     # ─────────────────────────────────────────────
     def load_data(self):
@@ -111,6 +112,7 @@ class KamusApp:
                                       for item in data if str(item).strip()}
                 else:
                     self.favorites = set()
+            # Error Handling: Mencegah error jika isi file JSON rusak atau gagal dibaca
             except (json.JSONDecodeError, OSError):
                 self.favorites = set()
         else:
@@ -127,6 +129,7 @@ class KamusApp:
                 json.dump(sorted(self.favorites), f,
                           ensure_ascii=False, indent=2)
                 f.write("\n")
+        # Error Handling: Mencegah error jika komputer menolak izin penyimpanan file
         except OSError:
             pass
 
@@ -328,6 +331,7 @@ class KamusApp:
             self.display_result(f"Mencari saran untuk '{word}'...", "info")
             self.root.update()
 
+            # Memanggil algoritma Levenshtein untuk saran kata typo
             suggestions = get_fuzzy_suggestions(
                 word, self.hash_table.keys(), max_suggestions=4)
             if suggestions:
@@ -366,6 +370,7 @@ class KamusApp:
                 messagebox.showinfo(
                     "Berhasil", f"'{word}' ditambahkan ke Daftar Favorit!")
         else:
+            # Error Handling: Validasi mencegah penambahan kata kosong atau tidak valid
             messagebox.showwarning(
                 "Gagal", "Cari kata yang valid terlebih dahulu.")
 
@@ -460,6 +465,7 @@ class KamusApp:
                   padx=10, pady=4, cursor="hand2").pack(pady=(0, 10))
 
     def quiz_mode(self):
+        # Error Handling: Validasi mencegah error jika database kamus kosong
         if not hasattr(self, 'kamus_data') or not self.kamus_data:
             messagebox.showwarning(
                 "Data Kosong", "Data kamus tidak ditemukan atau kosong.")
@@ -506,6 +512,7 @@ class KamusApp:
             if item.get(field_soal, "").strip() and item.get(field_jawab, "").strip()
         ]
         if not entri_valid:
+            # Error Handling: Validasi mencegah kuis error jika jumlah kosa kata kurang
             messagebox.showwarning(
                 "Kuis Kosong", "Tidak cukup kosa kata untuk mode ini.")
             return

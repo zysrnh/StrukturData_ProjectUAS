@@ -2,11 +2,13 @@ import difflib
 
 # ============================================================
 # MODUL 3: ALGORITMA FUZZY SEARCH (Levenshtein Distance)
+# Implementasi Algoritma Levenshtein Distance untuk menghitung jarak antar kata
 # Digunakan untuk koreksi typo dan saran kata yang mirip
 # ============================================================
 
 
 def levenshtein_distance(s1, s2):
+    # Menghitung seberapa banyak huruf yang harus diubah/ditambah/dihapus supaya s1 sama dengan s2
     if len(s1) < len(s2):
         return levenshtein_distance(s2, s1)
     if len(s2) == 0:
@@ -25,6 +27,7 @@ def levenshtein_distance(s1, s2):
 
 
 def get_fuzzy_suggestions(word, candidates, max_suggestions=5):
+    # Mencari kata-kata di kamus yang kemiripannya paling dekat dengan kata typo yang dimasukkan user
     if len(word) <= 2:
         max_distance = 1
     elif len(word) <= 4:
